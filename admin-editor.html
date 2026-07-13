@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Editor — Md. Rashedul Haque</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portfolio.css"/>
+<style>
+  .editor-wrap { max-width: 780px; margin: 0 auto; padding: 40px; }
+  .tabs { display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
+  .tabs button { padding:8px 16px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; }
+  .tabs button.active { background:var(--accent); border-color:var(--accent); }
+  .panel { display:none; }
+  .panel.active { display:block; }
+  .item-row { border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:12px; }
+  .item-row button { margin-right:8px; margin-top:8px; padding:6px 12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; }
+  label { display:block; margin-top:10px; margin-bottom:4px; color:var(--muted); font-size:0.9rem; }
+  .save-msg { color: var(--accent); margin-top:10px; }
+  .logout { float:right; }
+</style>
+</head>
+<body>
+<div class="editor-wrap">
+  <h1>Content Editor <button class="logout" id="logoutBtn">Log out</button></h1>
+  <p style="color:var(--muted);">Home and Resume content is fixed from your CV. Manage Projects, Blog posts, and Contact messages here.</p>
+
+  <div class="tabs">
+    <button data-panel="projects" class="active">Projects</button>
+    <button data-panel="blog">Blog</button>
+    <button data-panel="messages">Messages</button>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="panel active" id="panel-projects">
+    <h3>Add / Edit Project</h3>
+    <input type="hidden" id="projectId"/>
+    <label>Title</label>
+    <input type="text" id="projectTitle"/>
+    <label>Description</label>
+    <textarea id="projectDesc" rows="3"></textarea>
+    <label>Link (URL)</label>
+    <input type="text" id="projectLink"/>
+    <label>Image URL (optional)</label>
+    <input type="text" id="projectImage"/>
+    <button id="saveProject">Save Project</button>
+    <button id="clearProjectForm" type="button">Clear / New</button>
+    <p class="save-msg" id="projectMsg"></p>
+    <h3>Existing Projects</h3>
+    <div id="projectList"></div>
+  </div>
+
+  <!-- BLOG -->
+  <div class="panel" id="panel-blog">
+    <h3>Add / Edit Post</h3>
+    <input type="hidden" id="postId"/>
+    <label>Title</label>
+    <input type="text" id="postTitle"/>
+    <label>Content</label>
+    <textarea id="postContent" rows="8"></textarea>
+    <button id="savePost">Save Post</button>
+    <button id="clearPostForm" type="button">Clear / New</button>
+    <p class="save-msg" id="postMsg"></p>
+    <h3>Existing Posts</h3>
+    <div id="postList"></div>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="panel" id="panel-messages">
+    <h3>Contact Messages</h3>
+    <div id="messageList"></div>
+  </div>
+</div>
+<script type="module" src="js/admin-editor.js"></script>
+</body>
+</html>
