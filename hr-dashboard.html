@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HR Dashboard — EMS</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* ── Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #F0F2F5; --surface: #ffffff; --border: #DDE1E7;
+      --text: #0F1923; --muted: #64748B; --radius: 12px;
+      --navy: #1E3A5F; --steel: #2E5B88; --teal: #1B6B6B;
+      --sage: #3A6B4A; --gold: #8B6914; --rust: #8B3A2A;
+      --ease: cubic-bezier(0.65,0,0.35,1);
+    }
+    body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
+
+    /* ── Topbar ── */
+    .topbar { position:sticky; top:0; z-index:50; background:rgba(255,255,255,.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 28px; height:58px; }
+    .topbar-brand { display:flex; align-items:center; gap:10px; }
+    .brand-icon { width:32px; height:32px; background:var(--navy); border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .brand-name { font-size:0.8rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:var(--text); }
+    .topbar-right { display:flex; align-items:center; gap:14px; }
+    .user-badge { font-size:0.8rem; color:var(--muted); }
+    .logout-btn { background:none; border:1.5px solid var(--border); border-radius:7px; padding:6px 14px; font-family:inherit; font-size:0.8rem; font-weight:500; cursor:pointer; color:var(--text); transition:all 180ms; }
+    .logout-btn:hover { border-color:var(--navy); background:var(--navy); color:#fff; }
+
+    /* ── Layout ── */
+    .hr-main { max-width:1060px; margin:0 auto; padding:36px 24px 72px; animation:fadeUp 400ms var(--ease) both; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── Page header ── */
+    .page-top { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:32px; flex-wrap:wrap; gap:16px; }
+    .page-top h1 { font-size:1.5rem; font-weight:700; letter-spacing:-0.02em; }
+    .page-top p  { font-size:0.875rem; color:var(--muted); margin-top:4px; }
+    .year-pick { display:flex; align-items:center; gap:10px; }
+    .year-pick label { font-size:0.8rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; }
+    .year-pick select { padding:8px 14px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:0.9rem; font-weight:600; color:var(--text); background:var(--surface); outline:none; cursor:pointer; transition:border-color 200ms, box-shadow 200ms; }
+    .year-pick select:focus { border-color:var(--navy); box-shadow:0 0 0 3px rgba(30,58,95,.1); }
+
+    /* ── Loading ── */
+    .loading-state { text-align:center; padding:80px; color:var(--muted); font-size:0.9rem; }
+    .loading-state .icon { font-size:2.5rem; margin-bottom:14px; }
+
+    /* ── Section divider ── */
+    .section-title {
+      display:flex; align-items:center; gap:10px;
+      font-size:0.95rem; font-weight:700; letter-spacing:-0.01em;
+      color:var(--text); margin:36px 0 18px;
+    }
+    .section-title::before { content:''; flex:none; width:4px; height:18px; background:var(--navy); border-radius:2px; }
+    .section-title::after  { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* ── Stat row ── */
+    .stat-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:20px; }
+    .stat-card { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); padding:20px; }
+    .stat-card .sc-label { font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; }
+    .stat-card .sc-value { font-size:1.6rem; font-weight:700; letter-spacing:-0.03em; line-height:1; }
+    .stat-card .sc-sub   { font-size:0.75rem; color:var(--muted); margin-top:6px; }
+    .sc-navy { color:var(--navy); }
+    .sc-teal { color:var(--teal); }
+    .sc-sage { color:var(--sage); }
+    .sc-gold { color:var(--gold); }
+    .sc-rust { color:var(--rust); }
+
+    /* ── Pct card ── */
+    .pct-card { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); padding:24px 28px; display:flex; align-items:center; gap:36px; flex-wrap:wrap; margin-bottom:20px; }
+    .pct-left { flex:0 0 auto; }
+    .pct-label { font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
+    .pct-value { font-size:3.2rem; font-weight:800; letter-spacing:-0.06em; line-height:1; }
+    .pct-value.over  { color:var(--rust); }
+    .pct-value.under { color:var(--steel); }
+    .pct-value.exact { color:var(--sage); }
+    .pct-right { flex:1; min-width:220px; }
+    .pct-bar-track { height:8px; background:#EDF0F4; border-radius:99px; overflow:hidden; margin-bottom:16px; }
+    .pct-bar-fill  { height:100%; border-radius:99px; transition:width 800ms var(--ease); }
+    .pct-bar-fill.over  { background:var(--rust); }
+    .pct-bar-fill.under { background:var(--steel); }
+    .pct-bar-fill.exact { background:var(--sage); }
+    .pct-stats { display:flex; gap:28px; flex-wrap:wrap; }
+    .pct-stat .ps-label { font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:4px; }
+    .pct-stat .ps-val   { font-size:1.1rem; font-weight:700; letter-spacing:-0.02em; }
+    .ps-val.pos { color:var(--rust); }
+    .ps-val.neg { color:var(--steel); }
+
+    /* ── Chart cards ── */
+    .chart-card { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); padding:24px; }
+    .chart-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+    .chart-head h2 { font-size:0.95rem; font-weight:700; }
+    .chart-head p  { font-size:0.78rem; color:var(--muted); margin-top:3px; }
+    .chart-wrap     { position:relative; height:300px; }
+    .chart-wrap-md  { position:relative; height:260px; }
+    .chart-wrap-pie { position:relative; height:270px; }
+
+    /* Grid layouts */
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px; }
+    @media(max-width:640px){ .grid-2{grid-template-columns:1fr;} }
+    .mb-18 { margin-bottom:18px; }
+
+    /* YTD chip row */
+    .ytd-chips { display:flex; gap:24px; flex-wrap:wrap; }
+    .ytd-chip .yc-label { font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:4px; }
+    .ytd-chip .yc-val   { font-size:1.05rem; font-weight:700; letter-spacing:-0.02em; }
+    .yc-val.pos { color:var(--rust); }
+    .yc-val.neg { color:var(--steel); }
+
+    /* Last updated */
+    .last-updated { font-size:0.73rem; color:var(--muted); margin-bottom:20px; display:none; }
+
+    /* Diff */
+    .diff-p { color:var(--rust);  font-weight:600; }
+    .diff-n { color:var(--steel); font-weight:600; }
+    .diff-z { color:var(--muted); }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-icon">
+        <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+          <rect x="2" y="2" width="6" height="6" rx="1.5" fill="white"/>
+          <rect x="10" y="2" width="6" height="6" rx="1.5" fill="white" opacity=".6"/>
+          <rect x="2" y="10" width="6" height="6" rx="1.5" fill="white" opacity=".6"/>
+          <rect x="10" y="10" width="6" height="6" rx="1.5" fill="white" opacity=".3"/>
+        </svg>
+      </div>
+      <span class="brand-name">EMS</span>
+    </div>
+    <div class="topbar-right">
+      <a href="dashboard.html" style="font-size:0.8rem;color:var(--muted);text-decoration:none;">← Dashboard</a>
+      <span class="user-badge" id="topbarEmail"></span>
+      <button class="logout-btn" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+
+  <main class="hr-main">
+
+    <div class="page-top">
+      <div>
+        <h1>HR Dashboard</h1>
+        <p>Consolidated view — Leave, YEEP, Health, Food Quality & Welfare.</p>
+      </div>
+      <div class="year-pick">
+        <label for="yearSelect">Year</label>
+        <select id="yearSelect"></select>
+      </div>
+    </div>
+
+    <div id="loadingState" class="loading-state">
+      <div class="icon">📊</div>Loading data…
+    </div>
+
+    <div id="mainContent" style="display:none;">
+
+      <!-- Last updated -->
+      <div class="last-updated" id="lastUpdated"></div>
+
+      <!-- ════════ LEAVE ════════ -->
+      <div class="section-title">Leave Plan vs Consumed</div>
+
+      <!-- Pct card -->
+      <div class="pct-card">
+        <div class="pct-left">
+          <div class="pct-label">% Consumed of Plan</div>
+          <div class="pct-value" id="pctValue">—</div>
+        </div>
+        <div class="pct-right">
+          <div class="pct-bar-track"><div class="pct-bar-fill" id="pctBar" style="width:0%"></div></div>
+          <div class="pct-stats">
+            <div class="pct-stat">
+              <div class="ps-label">Total Plan</div>
+              <div class="ps-val" id="pctPlan">—</div>
+            </div>
+            <div class="pct-stat">
+              <div class="ps-label">Total Consumed</div>
+              <div class="ps-val" id="pctConsumed">—</div>
+            </div>
+            <div class="pct-stat">
+              <div class="ps-label">Difference</div>
+              <div class="ps-val" id="pctDiff">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leave bar chart -->
+      <div class="chart-card mb-18">
+        <div class="chart-head">
+          <div><h2>Monthly Plan vs Consumed</h2><p>Leave hours per month</p></div>
+        </div>
+        <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+      </div>
+
+      <!-- YTD line chart -->
+      <div class="chart-card mb-18">
+        <div class="chart-head">
+          <div><h2>YTD Cumulative</h2><p>Running total through the year</p></div>
+          <div class="ytd-chips">
+            <div class="ytd-chip"><div class="yc-label">YTD Plan</div><div class="yc-val" id="ytdPlanVal">—</div></div>
+            <div class="ytd-chip"><div class="yc-label">YTD Consumed</div><div class="yc-val" id="ytdConsumedVal">—</div></div>
+            <div class="ytd-chip"><div class="yc-label">YTD Diff</div><div class="yc-val" id="ytdDiffVal">—</div></div>
+          </div>
+        </div>
+        <div class="chart-wrap-md"><canvas id="ytdChart"></canvas></div>
+      </div>
+
+      <!-- ════════ YEEP ════════ -->
+      <div class="section-title">YEEP Installation</div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="sc-label">Total Installations</div><div class="sc-value sc-navy" id="yeepTotal">—</div><div class="sc-sub">ES + ER combined</div></div>
+        <div class="stat-card"><div class="sc-label">ES Team</div><div class="sc-value" style="color:#1E3A5F" id="yeepES">—</div><div class="sc-sub" id="yeepESPct">—</div></div>
+        <div class="stat-card"><div class="sc-label">ER Team</div><div class="sc-value" style="color:#1B6B6B" id="yeepER">—</div><div class="sc-sub" id="yeepERPct">—</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-head"><div><h2>ES vs ER Split</h2><p>Total by team</p></div></div>
+          <div class="chart-wrap-pie"><canvas id="yeepPieChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-head"><div><h2>Monthly ES vs ER</h2><p>Installations per month</p></div></div>
+          <div class="chart-wrap-md"><canvas id="yeepBarChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ════════ HEALTH CHECKUP ════════ -->
+      <div class="section-title">Health Checkup (YTD)</div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="sc-label">Annual Target</div><div class="sc-value sc-navy" id="hcTarget">—</div></div>
+        <div class="stat-card"><div class="sc-label">YTD Completed</div><div class="sc-value sc-sage" id="hcCompleted">—</div></div>
+        <div class="stat-card"><div class="sc-label">Achievement</div><div class="sc-value" id="hcPct">—</div><div class="sc-sub" id="hcPctSub"></div></div>
+      </div>
+      <div class="chart-card mb-18">
+        <div class="chart-head"><div><h2>Monthly Completed vs Target Pace</h2><p>Checkups completed vs equal-monthly pace</p></div></div>
+        <div class="chart-wrap"><canvas id="hcBarChart"></canvas></div>
+      </div>
+
+      <!-- ════════ FOOD QUALITY ════════ -->
+      <div class="section-title">Monthly Food Quality Survey</div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="sc-label">Total Surveys</div><div class="sc-value sc-navy" id="fqTotal">—</div></div>
+        <div class="stat-card"><div class="sc-label">Positive (VG + Good)</div><div class="sc-value sc-sage" id="fqPositive">—</div></div>
+        <div class="stat-card"><div class="sc-label">Negative (Bad + VB)</div><div class="sc-value sc-rust" id="fqNegative">—</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-head"><div><h2>Rating Distribution</h2><p>All months combined</p></div></div>
+          <div class="chart-wrap-pie"><canvas id="fqPieChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-head"><div><h2>Monthly by Rating</h2><p>Stacked count per month</p></div></div>
+          <div class="chart-wrap-md"><canvas id="fqBarChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ════════ WELFARE ════════ -->
+      <div class="section-title">Welfare / Workplace Issue Resolution</div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="sc-label">Total Issues</div><div class="sc-value sc-navy" id="wfTotal">—</div></div>
+        <div class="stat-card"><div class="sc-label">Solved</div><div class="sc-value sc-sage" id="wfSolved">—</div></div>
+        <div class="stat-card"><div class="sc-label">Follow-up</div><div class="sc-value sc-gold" id="wfFollowup">—</div><div class="sc-sub" id="wfPct"></div></div>
+      </div>
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-head"><div><h2>Resolution Split</h2><p>Solved vs follow-up total</p></div></div>
+          <div class="chart-wrap-pie"><canvas id="wfPieChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-head"><div><h2>Monthly Issues</h2><p>Total, solved and follow-up by month</p></div></div>
+          <div class="chart-wrap-md"><canvas id="wfBarChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ════════ OUTSTANDING DISCIPLINARY ════════ -->
+      <div class="section-title">Outstanding Disciplinary</div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="sc-label">Peak Month</div><div class="sc-value sc-rust" id="discPeak">—</div></div>
+        <div class="stat-card"><div class="sc-label">Monthly Avg</div><div class="sc-value sc-teal" id="discAvg">—</div></div>
+      </div>
+      <div class="chart-card mb-18">
+        <div class="chart-head">
+          <div><h2>Monthly Outstanding Cases</h2><p>Number of outstanding disciplinary cases per month</p></div>
+        </div>
+        <div class="chart-wrap"><canvas id="discBarChart"></canvas></div>
+      </div>
+      <div class="grid-2">
+        <div class="chart-card">
+          <div class="chart-head"><div><h2>Cases by Reason</h2><p>Distribution across disciplinary categories</p></div></div>
+          <div class="chart-wrap-pie"><canvas id="discPieChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-head"><div><h2>Trend</h2><p>Monthly outstanding case trend</p></div></div>
+          <div class="chart-wrap-md"><canvas id="discLineChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Weekly outstanding chart -->
+      <div class="chart-card mb-18">
+        <div class="chart-head">
+          <div><h2>Weekly Outstanding Cases</h2><p>Week-by-week breakdown for selected month</p></div>
+          <div>
+            <select id="discWeekMonthSelect" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:0.85rem;font-weight:600;color:var(--text);background:var(--surface);outline:none;cursor:pointer;transition:border-color 200ms;" onchange="refreshDiscWeekly()">
+            </select>
+          </div>
+        </div>
+        <div id="discWeeklyEmpty" style="text-align:center;padding:40px;color:var(--muted);font-size:0.875rem;display:none;">No weekly data for this month.</div>
+        <div class="chart-wrap" style="display:none;" id="discWeeklyWrap"><canvas id="discWeeklyChart"></canvas></div>
+      </div>
+
+    </div><!-- /mainContent -->
+  </main>
+
+  <div class="toast" id="toast"></div>
+  <script type="module" src="js/hr-dashboard.js"></script>
+</body>
+</html>
