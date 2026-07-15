@@ -1,0 +1,104 @@
+import { app } from "./firebase.js";
+import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const db = getFirestore(app);
+
+/* ── Fallback defaults (used if Firestore has no data yet) ─── */
+const DEFAULT_ABOUT = {
+  name: "Md. Rashedul Haque",
+  location: "Savar, Dhaka-1340",
+  degree: "MBA-HRM, BS-EEE",
+  experienceYears: "9",
+  phone: "On request",
+  email: "rhaque.eee@gmail.com",
+  availability: "Open to opportunities",
+  bio: "I am a passionate Human Resources professional with a strong background in HR operations, data analytics, and strategic business partnering. Currently serving as a Strategic Partner at Youngone Hi-Tech (Dhaka EPZ), I focus on aligning people strategies with organizational goals, driving employee engagement, and supporting leadership in building a high-performing culture."
+};
+
+const DEFAULT_SKILLS = [
+  { name: "HR Business Partnering", percentage: 95 },
+  { name: "Employee Relations & Engagement", percentage: 92 },
+  { name: "HR Analytics & Reporting", percentage: 90 },
+  { name: "Payroll Management", percentage: 90 },
+  { name: "HRMS Automation", percentage: 85 },
+  { name: "Power BI Dashboards", percentage: 88 }
+];
+
+const DEFAULT_EXPERIENCE = [
+  { role: "Strategic Business Partner", company: "Youngone Corporation", years: "Sep 2025 – Present", description: "HR Business Partner for Youngone Hi-Tech Sportswear Industries Ltd. (DEPZ) — driving employee engagement, organizational development, and strategic HR alignment with business goals." },
+  { role: "Deputy Manager, Human Resources", company: "Youngone Corporation", years: "Jun 2024 – Present", description: "Led HR analytics, payroll, and digital transformation projects. Designed Power BI dashboards for HR KPIs and managed payroll for 8,000+ employees with 100% compliance." },
+  { role: "Assistant Manager, Human Resources", company: "Youngone Corporation", years: "Mar 2021 – Jun 2024", description: "Delivered real-time HR dashboards and turnover reports. Co-led HRMS rollout and oversaw payroll, appraisal, and increment cycles for 6,000+ employees." },
+  { role: "Senior HR Officer", company: "Youngone Corporation", years: "Nov 2019 – Mar 2021", description: "Supported HRMS deployment, payroll, reconciliations, and performance evaluation processes." },
+  { role: "HR Officer", company: "Youngone Corporation", years: "Nov 2018 – Oct 2019", description: "Designed training programs, oversaw recruitment & selection, and managed compliance reporting." },
+  { role: "Assistant HR Officer", company: "Youngone Corporation", years: "Oct 2016 – Nov 2018", description: "Conducted training needs analysis and supported Health & Safety and compliance training programs." }
+];
+
+/* ── About Me ────────────────────────────────────────────── */
+(async () => {
+  let about = DEFAULT_ABOUT;
+  try {
+    const snap = await getDoc(doc(db, "site_content", "home"));
+    if (snap.exists() && Object.keys(snap.data()).length) about = { ...DEFAULT_ABOUT, ...snap.data() };
+  } catch (err) { /* keep defaults */ }
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+  set("sbName", about.name);
+  set("aboutBio", about.bio);
+  set("infoName", about.name);
+  set("infoLocation", about.location);
+  set("infoDegree", about.degree);
+  set("infoExperience", about.experienceYears ? `${about.experienceYears}+ Years` : null);
+  set("infoPhone", about.phone);
+  set("infoEmail", about.email);
+  set("infoAvailability", about.availability);
+  set("statExperience", about.experienceYears);
+})();
+
+/* ── Skills ──────────────────────────────────────────────── */
+(async () => {
+  const container = document.getElementById("skillsContainer");
+  if (!container) return;
+  let skills = DEFAULT_SKILLS;
+  try {
+    const snap = await getDocs(collection(db, "skills"));
+    if (!snap.empty) skills = snap.docs.map(d => d.data());
+  } catch (err) { /* keep defaults */ }
+
+  const half = Math.ceil(skills.length / 2);
+  const cols = [skills.slice(0, half), skills.slice(half)];
+  container.innerHTML = cols.map(col => `
+    <div class="col-sm-6">
+      ${col.map(s => `
+        <div class="skill mb-4">
+          <div class="d-flex justify-content-between">
+            <p class="mb-2">${s.name || ""}</p>
+            <p class="mb-2">${s.percentage || 0}%</p>
+          </div>
+          <div class="progress">
+            <div class="progress-bar bg-primary" role="progressbar" style="width:${s.percentage || 0}%" aria-valuenow="${s.percentage || 0}" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `).join("");
+})();
+
+/* ── Experience (short summary version for Home) ────────── */
+(async () => {
+  const container = document.getElementById("experienceContainer");
+  if (!container) return;
+  let experience = DEFAULT_EXPERIENCE;
+  try {
+    const snap = await getDocs(query(collection(db, "experience"), orderBy("order", "asc")));
+    if (!snap.empty) experience = snap.docs.map(d => d.data());
+  } catch (err) { /* keep defaults */ }
+
+  container.innerHTML = experience.map(e => `
+    <div class="position-relative mb-4">
+      <span class="bi bi-arrow-right fs-4 text-light position-absolute" style="top: -5px; left: -50px;"></span>
+      <h5 class="mb-1">${e.role || ""}</h5>
+      <p class="mb-2">${e.company || ""} ${e.years ? `| <small>${e.years}</small>` : ""}</p>
+      <p>${e.description || ""}</p>
+    </div>
+  `).join("");
+})();

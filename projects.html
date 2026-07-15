@@ -5,21 +5,30 @@
 <title>Projects — Md. Rashedul Haque</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="portfolio.css"/>
+<link rel="stylesheet" href="css/topnav.css"/>
 </head>
 <body>
-  <header class="site-nav">
-    <a class="brand" href="index.html">Rashedul Haque</a>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="projects.html" class="active">Projects</a>
-      <a href="resume.html">Resume</a>
-      <a href="blog.html">Blog</a>
-      <a href="contact.html">Contact</a>
-      <span id="authNav"><a href="login.html">Login</a></span>
-    </nav>
-  </header>
+  <nav class="topnav" id="topnav">
+            <div class="topnav-inner">
+                <a class="topnav-brand" href="index.html">
+                    <span class="topnav-brand-badge">RH</span>
+                    Rashedul Haque
+                </a>
+                <button class="topnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="topnav-links" id="navLinks">
+                    <a href="index.html">Home</a>
+                    <a href="projects.html" class="active">Projects</a>
+                    <a href="resume.html">Resume</a>
+                    <a href="blog.html">Blog</a>
+                    <a href="contact.html">Contact</a>
+                    <span id="authNav" class="topnav-auth"><a href="login.html">Login</a></span>
+                </div>
+            </div>
+        </nav>
 <section class="page-section">
   <h1>Projects</h1>
   <p>HR analytics dashboards, HRMS automation, and process improvement work.</p>
@@ -30,5 +39,6 @@
 <footer class="site-footer"><p>&copy; 2026 Md. Rashedul Haque.</p></footer>
 <script type="module" src="js/auth-nav.js"></script>
 <script type="module" src="js/projects.js"></script>
+<script src="js/nav.js"></script>
 </body>
 </html>

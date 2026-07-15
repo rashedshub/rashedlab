@@ -5,73 +5,247 @@
 <title>Admin Editor — Md. Rashedul Haque</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="portfolio.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<link href="css/topnav.css" rel="stylesheet">
 <style>
-  .editor-wrap { max-width: 780px; margin: 0 auto; padding: 40px; }
-  .tabs { display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
-  .tabs button { padding:8px 16px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; }
-  .tabs button.active { background:var(--accent); border-color:var(--accent); }
+  body { background: var(--dark); color: var(--light); font-family: 'Heebo', sans-serif; }
+  .editor-wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+  .editor-header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px; }
+  .editor-header h1 { color: #fff; font-size: 1.8rem; margin: 0; }
+  .editor-sub { color: rgba(242,242,242,0.6); margin-bottom: 28px; }
+
+  .tabs { display:flex; gap:8px; margin-bottom:28px; flex-wrap:wrap; }
+  .tabs button {
+    padding:9px 18px; border-radius:100px; border:1px solid rgba(255,255,255,0.15);
+    background: var(--secondary); color: var(--light); cursor:pointer; font-family:inherit; font-size:0.88rem; font-weight:500;
+  }
+  .tabs button.active { background: var(--primary); border-color: var(--primary); color:#fff; }
+
   .panel { display:none; }
   .panel.active { display:block; }
-  .item-row { border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:12px; }
-  .item-row button { margin-right:8px; margin-top:8px; padding:6px 12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; }
-  label { display:block; margin-top:10px; margin-bottom:4px; color:var(--muted); font-size:0.9rem; }
-  .save-msg { color: var(--accent); margin-top:10px; }
-  .logout { float:right; }
+  .panel-card { background: var(--secondary); border-radius: 10px; padding: 24px; margin-bottom: 24px; }
+  .panel-card h3 { color:#fff; font-size:1.1rem; margin-bottom:16px; }
+
+  .item-row {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px; padding: 16px; margin-bottom: 12px;
+  }
+  .item-row strong { color: #fff; }
+  .item-row p { color: rgba(242,242,242,0.65); margin: 4px 0 0; font-size: 0.9rem; }
+  .item-row button {
+    margin-right:8px; margin-top:10px; padding:6px 14px; border-radius:6px;
+    border:1px solid rgba(255,255,255,0.15); background: var(--dark); color: var(--light); cursor:pointer; font-size:0.82rem;
+  }
+  .item-row button:hover { border-color: var(--primary); }
+
+  label { display:block; margin-top:14px; margin-bottom:5px; color: rgba(242,242,242,0.6); font-size:0.85rem; font-weight:500; }
+
+  .form-control, textarea.form-control, input.form-control {
+    width:100%; padding:11px 14px; background: var(--dark); border:1px solid rgba(255,255,255,0.12);
+    border-radius:6px; color: var(--light); font-family:inherit; font-size:0.92rem;
+  }
+  .form-control:focus { outline:none; border-color: var(--primary); }
+
+  .btn-save {
+    background: var(--primary); color:#fff; border:none; padding:11px 26px; border-radius:6px;
+    font-weight:600; font-size:0.9rem; cursor:pointer; margin-top:16px; margin-right:10px;
+  }
+  .btn-save:hover { background:#00d38c; }
+  .btn-clear {
+    background:transparent; color: var(--light); border:1px solid rgba(255,255,255,0.15);
+    padding:11px 22px; border-radius:6px; font-size:0.9rem; cursor:pointer; margin-top:16px;
+  }
+
+  .save-msg { color: var(--primary); margin-top:12px; font-size:0.88rem; }
+  .logout {
+    background:transparent; border:1px solid rgba(255,255,255,0.2); color: var(--light);
+    padding:9px 18px; border-radius:100px; cursor:pointer; font-family:inherit; font-size:0.85rem;
+  }
+  .logout:hover { border-color: var(--primary); color: var(--primary); }
+
+  .field-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+  @media (max-width: 640px) { .field-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
+<nav class="topnav" id="topnav">
+  <div class="topnav-inner">
+    <a class="topnav-brand" href="index.html">
+      <span class="topnav-brand-badge">RH</span>
+      Rashedul Haque
+    </a>
+    <button class="topnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="topnav-links" id="navLinks">
+      <a href="index.html">Home</a>
+      <a href="projects.html">Projects</a>
+      <a href="resume.html">Resume</a>
+      <a href="blog.html">Blog</a>
+      <a href="contact.html">Contact</a>
+      <span id="authNav" class="topnav-auth"><a href="login.html">Login</a></span>
+    </div>
+  </div>
+</nav>
+
 <div class="editor-wrap">
-  <h1>Content Editor <button class="logout" id="logoutBtn">Log out</button></h1>
-  <p style="color:var(--muted);">Home and Resume content is fixed from your CV. Manage Projects, Blog posts, and Contact messages here.</p>
+  <div class="editor-header">
+    <h1>Content Editor</h1>
+    <button class="logout" id="logoutBtn">Log out</button>
+  </div>
+  <p class="editor-sub">Manage everything shown on your site — About Me, Skills, Experience, Projects, Blog, and Contact messages.</p>
 
   <div class="tabs">
-    <button data-panel="projects" class="active">Projects</button>
+    <button data-panel="about" class="active">About Me</button>
+    <button data-panel="skills">Skills</button>
+    <button data-panel="experience">Experience</button>
+    <button data-panel="projects">Projects</button>
     <button data-panel="blog">Blog</button>
     <button data-panel="messages">Messages</button>
   </div>
 
+  <!-- ABOUT ME -->
+  <div class="panel active" id="panel-about">
+    <div class="panel-card">
+      <h3>About Me</h3>
+      <div class="field-grid">
+        <div>
+          <label>Name</label>
+          <input type="text" class="form-control" id="aboutName"/>
+        </div>
+        <div>
+          <label>Location</label>
+          <input type="text" class="form-control" id="aboutLocation"/>
+        </div>
+        <div>
+          <label>Degree</label>
+          <input type="text" class="form-control" id="aboutDegree"/>
+        </div>
+        <div>
+          <label>Years of Experience</label>
+          <input type="number" class="form-control" id="aboutExperienceYears"/>
+        </div>
+        <div>
+          <label>Phone</label>
+          <input type="text" class="form-control" id="aboutPhone"/>
+        </div>
+        <div>
+          <label>Email</label>
+          <input type="email" class="form-control" id="aboutEmail"/>
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label>Availability</label>
+          <input type="text" class="form-control" id="aboutAvailability"/>
+        </div>
+      </div>
+      <label>Bio</label>
+      <textarea class="form-control" id="aboutBio" rows="6"></textarea>
+      <button class="btn-save" id="saveAbout">Save About Me</button>
+      <p class="save-msg" id="aboutMsg"></p>
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="panel" id="panel-skills">
+    <div class="panel-card">
+      <h3>Add / Edit Skill</h3>
+      <input type="hidden" id="skillId"/>
+      <label>Skill Name</label>
+      <input type="text" class="form-control" id="skillName"/>
+      <label>Proficiency (%)</label>
+      <input type="number" class="form-control" id="skillPercentage" min="0" max="100"/>
+      <button class="btn-save" id="saveSkill">Save Skill</button>
+      <button class="btn-clear" id="clearSkillForm" type="button">Clear / New</button>
+      <p class="save-msg" id="skillMsg"></p>
+    </div>
+    <h3 style="color:#fff;">Existing Skills</h3>
+    <div id="skillList"></div>
+  </div>
+
+  <!-- EXPERIENCE -->
+  <div class="panel" id="panel-experience">
+    <div class="panel-card">
+      <h3>Add / Edit Experience</h3>
+      <input type="hidden" id="expId"/>
+      <div class="field-grid">
+        <div>
+          <label>Role / Title</label>
+          <input type="text" class="form-control" id="expRole"/>
+        </div>
+        <div>
+          <label>Company</label>
+          <input type="text" class="form-control" id="expCompany"/>
+        </div>
+        <div>
+          <label>Years (e.g. "Jun 2024 – Present")</label>
+          <input type="text" class="form-control" id="expYears"/>
+        </div>
+        <div>
+          <label>Order (lower shows first)</label>
+          <input type="number" class="form-control" id="expOrder"/>
+        </div>
+      </div>
+      <label>Short Description (used on Home page)</label>
+      <textarea class="form-control" id="expDescription" rows="3"></textarea>
+      <label>Detail Bullets — one per line (used on Resume page)</label>
+      <textarea class="form-control" id="expBullets" rows="5"></textarea>
+      <button class="btn-save" id="saveExp">Save Experience</button>
+      <button class="btn-clear" id="clearExpForm" type="button">Clear / New</button>
+      <p class="save-msg" id="expMsg"></p>
+    </div>
+    <h3 style="color:#fff;">Existing Experience</h3>
+    <div id="expList"></div>
+  </div>
+
   <!-- PROJECTS -->
-  <div class="panel active" id="panel-projects">
-    <h3>Add / Edit Project</h3>
-    <input type="hidden" id="projectId"/>
-    <label>Title</label>
-    <input type="text" id="projectTitle"/>
-    <label>Description</label>
-    <textarea id="projectDesc" rows="3"></textarea>
-    <label>Link (URL)</label>
-    <input type="text" id="projectLink"/>
-    <label>Image URL (optional)</label>
-    <input type="text" id="projectImage"/>
-    <button id="saveProject">Save Project</button>
-    <button id="clearProjectForm" type="button">Clear / New</button>
-    <p class="save-msg" id="projectMsg"></p>
-    <h3>Existing Projects</h3>
+  <div class="panel" id="panel-projects">
+    <div class="panel-card">
+      <h3>Add / Edit Project</h3>
+      <input type="hidden" id="projectId"/>
+      <label>Title</label>
+      <input type="text" class="form-control" id="projectTitle"/>
+      <label>Description</label>
+      <textarea class="form-control" id="projectDesc" rows="3"></textarea>
+      <label>Link (URL)</label>
+      <input type="text" class="form-control" id="projectLink"/>
+      <label>Image URL (optional)</label>
+      <input type="text" class="form-control" id="projectImage"/>
+      <button class="btn-save" id="saveProject">Save Project</button>
+      <button class="btn-clear" id="clearProjectForm" type="button">Clear / New</button>
+      <p class="save-msg" id="projectMsg"></p>
+    </div>
+    <h3 style="color:#fff;">Existing Projects</h3>
     <div id="projectList"></div>
   </div>
 
   <!-- BLOG -->
   <div class="panel" id="panel-blog">
-    <h3>Add / Edit Post</h3>
-    <input type="hidden" id="postId"/>
-    <label>Title</label>
-    <input type="text" id="postTitle"/>
-    <label>Content</label>
-    <textarea id="postContent" rows="8"></textarea>
-    <button id="savePost">Save Post</button>
-    <button id="clearPostForm" type="button">Clear / New</button>
-    <p class="save-msg" id="postMsg"></p>
-    <h3>Existing Posts</h3>
+    <div class="panel-card">
+      <h3>Add / Edit Post</h3>
+      <input type="hidden" id="postId"/>
+      <label>Title</label>
+      <input type="text" class="form-control" id="postTitle"/>
+      <label>Content</label>
+      <textarea class="form-control" id="postContent" rows="8"></textarea>
+      <button class="btn-save" id="savePost">Save Post</button>
+      <button class="btn-clear" id="clearPostForm" type="button">Clear / New</button>
+      <p class="save-msg" id="postMsg"></p>
+    </div>
+    <h3 style="color:#fff;">Existing Posts</h3>
     <div id="postList"></div>
   </div>
 
   <!-- MESSAGES -->
   <div class="panel" id="panel-messages">
-    <h3>Contact Messages</h3>
+    <h3 style="color:#fff;">Contact Messages</h3>
     <div id="messageList"></div>
   </div>
 </div>
 <script type="module" src="js/admin-editor.js"></script>
+<script type="module" src="js/auth-nav.js"></script>
+<script src="js/nav.js"></script>
 </body>
 </html>

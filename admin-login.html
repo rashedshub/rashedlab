@@ -2,14 +2,51 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Admin Login — My Portfolio</title>
+<title>Admin Login — Md. Rashedul Haque</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="portfolio.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<link href="css/topnav.css" rel="stylesheet">
+<style>
+  body { background: var(--dark); color: var(--light); font-family: 'Heebo', sans-serif; }
+  .login-wrap { max-width: 380px; margin: 0 auto; padding: 60px 20px; }
+  .login-wrap h1 { color: #fff; font-size: 1.5rem; margin-bottom: 20px; }
+  .login-wrap input {
+    width:100%; padding:12px 14px; margin-bottom:14px; background: var(--secondary);
+    border:1px solid rgba(255,255,255,0.12); border-radius:6px; color: var(--light); font-family:inherit;
+  }
+  .login-wrap button {
+    background: var(--primary); color:#fff; border:none; padding:12px 24px; border-radius:6px;
+    font-weight:600; cursor:pointer; width:100%;
+  }
+  .login-wrap button:hover { background:#00d38c; }
+  .login-wrap a { color: var(--primary); }
+  #loginMsg { color: #ffb4b4; margin-top: 10px; font-size: 0.88rem; }
+</style>
 </head>
 <body>
-  <section class="page-section" style="max-width:400px;">
+  <nav class="topnav" id="topnav">
+    <div class="topnav-inner">
+      <a class="topnav-brand" href="index.html">
+        <span class="topnav-brand-badge">RH</span>
+        Rashedul Haque
+      </a>
+      <button class="topnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topnav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="projects.html">Projects</a>
+        <a href="resume.html">Resume</a>
+        <a href="blog.html">Blog</a>
+        <a href="contact.html">Contact</a>
+        <span id="authNav" class="topnav-auth"><a href="login.html">Login</a></span>
+      </div>
+    </div>
+  </nav>
+  <section class="login-wrap">
     <h1>Admin Login</h1>
     <form id="loginForm">
       <input type="email" id="email" placeholder="Email" required/>
@@ -20,5 +57,7 @@
     <p><a href="index.html">&larr; Back to site</a></p>
   </section>
   <script type="module" src="js/admin-login.js"></script>
+  <script type="module" src="js/auth-nav.js"></script>
+  <script src="js/nav.js"></script>
 </body>
 </html>

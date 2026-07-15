@@ -7,9 +7,29 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="portfolio.css"/>
+<link rel="stylesheet" href="css/topnav.css"/>
 </head>
 <body>
-  <section class="page-section" style="max-width:400px;">
+  <nav class="topnav" id="topnav">
+            <div class="topnav-inner">
+                <a class="topnav-brand" href="index.html">
+                    <span class="topnav-brand-badge">RH</span>
+                    Rashedul Haque
+                </a>
+                <button class="topnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="topnav-links" id="navLinks">
+                    <a href="index.html">Home</a>
+                    <a href="projects.html">Projects</a>
+                    <a href="resume.html">Resume</a>
+                    <a href="blog.html">Blog</a>
+                    <a href="contact.html">Contact</a>
+                    <span id="authNav" class="topnav-auth"><a href="login.html">Login</a></span>
+                </div>
+            </div>
+        </nav>
+<section class="page-section" style="max-width:400px;">
     <h1>Create Account</h1>
     <form id="signupForm">
       <input type="text" id="name" placeholder="Your name" required/>
@@ -22,5 +42,7 @@
     <p><a href="index.html">&larr; Back to site</a></p>
   </section>
   <script type="module" src="js/signup.js"></script>
+<script type="module" src="js/auth-nav.js"></script>
+<script src="js/nav.js"></script>
 </body>
 </html>

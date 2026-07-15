@@ -5,21 +5,30 @@
 <title>Resume — Md. Rashedul Haque</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="portfolio.css"/>
+<link rel="stylesheet" href="css/topnav.css"/>
 </head>
 <body>
-  <header class="site-nav">
-    <a class="brand" href="index.html">Rashedul Haque</a>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="projects.html">Projects</a>
-      <a href="resume.html" class="active">Resume</a>
-      <a href="blog.html">Blog</a>
-      <a href="contact.html">Contact</a>
-      <span id="authNav"><a href="login.html">Login</a></span>
-    </nav>
-  </header>
+  <nav class="topnav" id="topnav">
+            <div class="topnav-inner">
+                <a class="topnav-brand" href="index.html">
+                    <span class="topnav-brand-badge">RH</span>
+                    Rashedul Haque
+                </a>
+                <button class="topnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="topnav-links" id="navLinks">
+                    <a href="index.html">Home</a>
+                    <a href="projects.html">Projects</a>
+                    <a href="resume.html" class="active">Resume</a>
+                    <a href="blog.html">Blog</a>
+                    <a href="contact.html">Contact</a>
+                    <span id="authNav" class="topnav-auth"><a href="login.html">Login</a></span>
+                </div>
+            </div>
+        </nav>
 
   <section class="resume-wrap">
     <div class="resume-header">
@@ -30,72 +39,8 @@
 
 
     <h2>Experience</h2>
-    <div class="timeline">
-    <div class="entry">
-      <div class="role">Strategic Business Partner — Youngone Corporation</div>
-      <div class="meta">September 2025 – Present (Savar)</div>
-      <p>HR Business Partner for Youngone Hi-Tech Sportswear Industries Ltd. (DEPZ) — driving employee engagement, organizational development, and strategic HR alignment with business goals.</p>
-      <ul>
-        <li>Partner with business leaders to align HR strategy with operational needs.</li>
-        <li>Lead workforce planning, promotion, and performance management.</li>
-        <li>Drive cultural transformation and employee engagement initiatives.</li>
-        <li>Advise leadership on people strategy, succession planning, and capability building.</li>
-      </ul>
-    </div>
-
-    <div class="entry">
-      <div class="role">Deputy Manager, Human Resources — Youngone Corporation</div>
-      <div class="meta">June 2024 – Present · Dhaka, Bangladesh</div>
-      <p>Led HR analytics, payroll, and digital transformation projects to support efficient HR operations and data-driven decisions.</p>
-      <ul>
-        <li>Designed and maintained Power BI dashboards for HR KPIs and management insights.</li>
-        <li>Managed payroll operations for 8,000+ employees with 100% compliance.</li>
-        <li>Collaborated with IT to enhance HRMS automation and data accuracy.</li>
-        <li>Introduced HR reporting standards and improved HR data visibility.</li>
-      </ul>
-    </div>
-
-    <div class="entry">
-      <div class="role">Assistant Manager, Human Resources — Youngone Corporation</div>
-      <div class="meta">March 2021 – June 2024 · Dhaka, Bangladesh</div>
-      <p>Focused on operational excellence through process optimization, analytics, and HR technology integration.</p>
-      <ul>
-        <li>Delivered real-time HR dashboards and turnover reports for decision-making.</li>
-        <li>Co-led HRMS rollout across departments.</li>
-        <li>Oversaw payroll, appraisal, and increment cycles for 6,000+ employees.</li>
-      </ul>
-    </div>
-
-    <div class="entry">
-      <div class="role">Senior Human Resources Officer — Youngone Corporation</div>
-      <div class="meta">November 2019 – March 2021 · Dhaka, Bangladesh</div>
-      <ul>
-        <li>Supported HRMS deployment and inter-department collaboration.</li>
-        <li>Managed payroll, reconciliations, and performance evaluation processes.</li>
-        <li>Coordinated training & development programs and policy preparation.</li>
-      </ul>
-    </div>
-
-    <div class="entry">
-      <div class="role">Human Resources Officer — Youngone Corporation</div>
-      <div class="meta">November 2018 – October 2019 · Dhaka, Bangladesh</div>
-      <ul>
-        <li>Designed and delivered training programs (Skill Development, H&S, Labor Issues).</li>
-        <li>Oversaw recruitment & selection aligned with company policy.</li>
-        <li>Processed maternity benefits and managed compliance reporting.</li>
-      </ul>
-    </div>
-
-    <div class="entry">
-      <div class="role">Assistant Human Resources Officer — Youngone Corporation</div>
-      <div class="meta">October 2016 – November 2018 · Dhaka, Bangladesh</div>
-      <ul>
-        <li>Conducted training needs analysis and coordinated employee development initiatives.</li>
-        <li>Supported Health & Safety and compliance training programs.</li>
-        <li>Maintained records aligned with audit and legal requirements.</li>
-      </ul>
-    </div>
-
+    <div class="timeline" id="resumeExperience">
+      <!-- populated by js/resume.js from Firestore; falls back to defaults if empty -->
     </div>
 
     <h2>Education</h2>
@@ -126,5 +71,7 @@
 
   <footer class="site-footer"><p>&copy; 2026 Md. Rashedul Haque.</p></footer>
   <script type="module" src="js/auth-nav.js"></script>
+  <script type="module" src="js/resume.js"></script>
+  <script src="js/nav.js"></script>
 </body>
 </html>
