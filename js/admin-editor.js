@@ -54,18 +54,28 @@ async function loadAbout() {
   el("aboutBio").value = d.bio || "";
 }
 el("saveAbout").addEventListener("click", async () => {
-  await setDoc(doc(db, "site_content", "home"), {
-    name: el("aboutName").value,
-    location: el("aboutLocation").value,
-    degree: el("aboutDegree").value,
-    experienceYears: el("aboutExperienceYears").value,
-    phone: el("aboutPhone").value,
-    email: el("aboutEmail").value,
-    availability: el("aboutAvailability").value,
-    bio: el("aboutBio").value
-  });
-  el("aboutMsg").textContent = "Saved.";
-  setTimeout(() => el("aboutMsg").textContent = "", 2000);
+  el("aboutMsg").style.color = "";
+  el("aboutMsg").textContent = "Saving…";
+  try {
+    await setDoc(doc(db, "site_content", "home"), {
+      name: el("aboutName").value,
+      location: el("aboutLocation").value,
+      degree: el("aboutDegree").value,
+      experienceYears: el("aboutExperienceYears").value,
+      phone: el("aboutPhone").value,
+      email: el("aboutEmail").value,
+      availability: el("aboutAvailability").value,
+      bio: el("aboutBio").value
+    });
+    el("aboutMsg").textContent = "Saved.";
+    setTimeout(() => el("aboutMsg").textContent = "", 2500);
+  } catch (err) {
+    console.error("Failed to save About Me:", err);
+    el("aboutMsg").style.color = "#ff8080";
+    el("aboutMsg").textContent = err.code === "permission-denied"
+      ? "Save failed — permission denied. Check your Firestore rules for the site_content collection."
+      : `Save failed: ${err.message}`;
+  }
 });
 
 // ── Skills ──────────────────────────────────────────────────
@@ -111,15 +121,23 @@ el("saveSkill").addEventListener("click", async () => {
     percentage: Number(el("skillPercentage").value) || 0
   };
   const id = el("skillId").value;
-  if (id) {
-    await updateDoc(doc(db, "skills", id), data);
-  } else {
-    await addDoc(collection(db, "skills"), data);
+  el("skillMsg").style.color = "";
+  el("skillMsg").textContent = "Saving…";
+  try {
+    if (id) {
+      await updateDoc(doc(db, "skills", id), data);
+    } else {
+      await addDoc(collection(db, "skills"), data);
+    }
+    el("skillMsg").textContent = "Saved.";
+    setTimeout(() => el("skillMsg").textContent = "", 2500);
+    clearSkillForm();
+    loadSkills();
+  } catch (err) {
+    console.error("Failed to save skill:", err);
+    el("skillMsg").style.color = "#ff8080";
+    el("skillMsg").textContent = `Save failed: ${err.message}`;
   }
-  el("skillMsg").textContent = "Saved.";
-  setTimeout(() => el("skillMsg").textContent = "", 2000);
-  clearSkillForm();
-  loadSkills();
 });
 
 // ── Experience ──────────────────────────────────────────────
@@ -178,15 +196,23 @@ el("saveExp").addEventListener("click", async () => {
     bullets: el("expBullets").value.split("\n").map(l => l.trim()).filter(Boolean)
   };
   const id = el("expId").value;
-  if (id) {
-    await updateDoc(doc(db, "experience", id), data);
-  } else {
-    await addDoc(collection(db, "experience"), data);
+  el("expMsg").style.color = "";
+  el("expMsg").textContent = "Saving…";
+  try {
+    if (id) {
+      await updateDoc(doc(db, "experience", id), data);
+    } else {
+      await addDoc(collection(db, "experience"), data);
+    }
+    el("expMsg").textContent = "Saved.";
+    setTimeout(() => el("expMsg").textContent = "", 2500);
+    clearExpForm();
+    loadExperience();
+  } catch (err) {
+    console.error("Failed to save experience:", err);
+    el("expMsg").style.color = "#ff8080";
+    el("expMsg").textContent = `Save failed: ${err.message}`;
   }
-  el("expMsg").textContent = "Saved.";
-  setTimeout(() => el("expMsg").textContent = "", 2000);
-  clearExpForm();
-  loadExperience();
 });
 
 // ── Projects ────────────────────────────────────────────────
@@ -236,15 +262,23 @@ el("saveProject").addEventListener("click", async () => {
     image: el("projectImage").value
   };
   const id = el("projectId").value;
-  if (id) {
-    await updateDoc(doc(db, "projects", id), data);
-  } else {
-    await addDoc(collection(db, "projects"), data);
+  el("projectMsg").style.color = "";
+  el("projectMsg").textContent = "Saving…";
+  try {
+    if (id) {
+      await updateDoc(doc(db, "projects", id), data);
+    } else {
+      await addDoc(collection(db, "projects"), data);
+    }
+    el("projectMsg").textContent = "Saved.";
+    setTimeout(() => el("projectMsg").textContent = "", 2500);
+    clearProjectForm();
+    loadProjects();
+  } catch (err) {
+    console.error("Failed to save project:", err);
+    el("projectMsg").style.color = "#ff8080";
+    el("projectMsg").textContent = `Save failed: ${err.message}`;
   }
-  el("projectMsg").textContent = "Saved.";
-  setTimeout(() => el("projectMsg").textContent = "", 2000);
-  clearProjectForm();
-  loadProjects();
 });
 
 // ── Blog ────────────────────────────────────────────────────
@@ -285,16 +319,24 @@ async function loadPosts() {
 el("savePost").addEventListener("click", async () => {
   const id = el("postId").value;
   const data = { title: el("postTitle").value, content: el("postContent").value };
-  if (id) {
-    await updateDoc(doc(db, "blog_posts", id), data);
-  } else {
-    data.createdAt = Date.now();
-    await addDoc(collection(db, "blog_posts"), data);
+  el("postMsg").style.color = "";
+  el("postMsg").textContent = "Saving…";
+  try {
+    if (id) {
+      await updateDoc(doc(db, "blog_posts", id), data);
+    } else {
+      data.createdAt = Date.now();
+      await addDoc(collection(db, "blog_posts"), data);
+    }
+    el("postMsg").textContent = "Saved.";
+    setTimeout(() => el("postMsg").textContent = "", 2500);
+    clearPostForm();
+    loadPosts();
+  } catch (err) {
+    console.error("Failed to save post:", err);
+    el("postMsg").style.color = "#ff8080";
+    el("postMsg").textContent = `Save failed: ${err.message}`;
   }
-  el("postMsg").textContent = "Saved.";
-  setTimeout(() => el("postMsg").textContent = "", 2000);
-  clearPostForm();
-  loadPosts();
 });
 
 // ── Messages ────────────────────────────────────────────────
