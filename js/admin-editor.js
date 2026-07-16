@@ -25,6 +25,8 @@ onAuthStateChanged(auth, async (user) => {
   loadProjects();
   loadPosts();
   loadMessages();
+  loadServices();
+  loadNewsletter();
 });
 
 el("logoutBtn").addEventListener("click", () => signOut(auth).then(() => window.location.href = "admin-login.html"));
@@ -350,8 +352,95 @@ async function loadMessages() {
     const row = document.createElement("div");
     row.className = "item-row";
     row.innerHTML = `<strong>${m.name || ""}</strong> — ${m.email || ""}
+      ${m.subject ? `<p style="color:var(--primary,#00B87B);font-weight:500;">${m.subject}</p>` : ""}
       <p>${m.createdAt ? new Date(m.createdAt).toLocaleString() : ""}</p>
       <p>${m.message || ""}</p>`;
     list.appendChild(row);
   });
+}
+
+// ── Services ────────────────────────────────────────────────
+function clearServiceForm() {
+  el("serviceId").value = "";
+  el("serviceTitle").value = "";
+  el("serviceDescription").value = "";
+  el("serviceIcon").value = "";
+}
+el("clearServiceForm").addEventListener("click", clearServiceForm);
+
+async function loadServices() {
+  const snap = await getDocs(collection(db, "services"));
+  const list = el("serviceList");
+  list.innerHTML = "";
+  snap.forEach(d => {
+    const s = d.data();
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.innerHTML = `<strong>${s.title || ""}</strong><p>${s.description || ""}</p>
+      <div>
+        <button data-edit="${d.id}">Edit</button>
+        <button data-delete="${d.id}">Delete</button>
+      </div>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", async () => {
+    const s = await getDoc(doc(db, "services", b.dataset.edit));
+    const d = s.data();
+    el("serviceId").value = b.dataset.edit;
+    el("serviceTitle").value = d.title || "";
+    el("serviceDescription").value = d.description || "";
+    el("serviceIcon").value = d.icon || "";
+  }));
+  list.querySelectorAll("[data-delete]").forEach(b => b.addEventListener("click", async () => {
+    if (!confirm("Delete this service?")) return;
+    await deleteDoc(doc(db, "services", b.dataset.delete));
+    loadServices();
+  }));
+}
+
+el("saveService").addEventListener("click", async () => {
+  const data = {
+    title: el("serviceTitle").value,
+    description: el("serviceDescription").value,
+    icon: el("serviceIcon").value || "fa-briefcase"
+  };
+  const id = el("serviceId").value;
+  el("serviceMsg").style.color = "";
+  el("serviceMsg").textContent = "Saving…";
+  try {
+    if (id) {
+      await updateDoc(doc(db, "services", id), data);
+    } else {
+      await addDoc(collection(db, "services"), data);
+    }
+    el("serviceMsg").textContent = "Saved.";
+    setTimeout(() => el("serviceMsg").textContent = "", 2500);
+    clearServiceForm();
+    loadServices();
+  } catch (err) {
+    console.error("Failed to save service:", err);
+    el("serviceMsg").style.color = "#ff8080";
+    el("serviceMsg").textContent = `Save failed: ${err.message}`;
+  }
+});
+
+// ── Newsletter (read-only) ─────────────────────────────────
+async function loadNewsletter() {
+  const list = el("newsletterList");
+  try {
+    const snap = await getDocs(query(collection(db, "newsletter_subscribers"), orderBy("createdAt", "desc")));
+    list.innerHTML = "";
+    if (snap.empty) { list.innerHTML = "<p style='color:rgba(242,242,242,0.6);'>No subscribers yet.</p>"; return; }
+    snap.forEach(d => {
+      const s = d.data();
+      const row = document.createElement("div");
+      row.className = "item-row";
+      row.innerHTML = `<strong>${s.email || ""}</strong>
+        <p>${s.createdAt ? new Date(s.createdAt).toLocaleString() : ""}</p>`;
+      list.appendChild(row);
+    });
+  } catch (err) {
+    console.error("Failed to load subscribers:", err);
+    list.innerHTML = "<p style='color:#ff8080;'>Couldn't load subscribers — check Firestore rules for newsletter_subscribers.</p>";
+  }
 }

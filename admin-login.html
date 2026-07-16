@@ -8,14 +8,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
-<link href="css/topnav.css" rel="stylesheet">
+<link href="css/mainnav.css" rel="stylesheet">
 <style>
   body { background: var(--dark); color: var(--light); font-family: 'Heebo', sans-serif; }
   .login-wrap { max-width: 380px; margin: 0 auto; padding: 60px 20px; }
   .login-wrap h1 { color: #fff; font-size: 1.5rem; margin-bottom: 20px; }
   .login-wrap input {
-    width:100%; padding:12px 14px; margin-bottom:14px; background: var(--secondary);
-    border:1px solid rgba(255,255,255,0.12); border-radius:6px; color: var(--light); font-family:inherit;
+    width:100%; padding:12px 14px; margin-bottom:14px; background: var(--secondary) !important;
+    border:1px solid rgba(255,255,255,0.12); border-radius:6px; color: var(--light) !important; font-family:inherit;
+  }
+  .login-wrap input:-webkit-autofill,
+  .login-wrap input:-webkit-autofill:hover,
+  .login-wrap input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--secondary) inset !important;
+    box-shadow: 0 0 0 1000px var(--secondary) inset !important;
+    -webkit-text-fill-color: var(--light) !important;
+    caret-color: var(--light);
   }
   .login-wrap button {
     background: var(--primary); color:#fff; border:none; padding:12px 24px; border-radius:6px;
@@ -27,25 +35,32 @@
 </style>
 </head>
 <body>
-  <nav class="topnav" id="topnav">
-    <div class="topnav-inner">
-      <a class="topnav-brand" href="index.html">
-        <span class="topnav-brand-badge">RH</span>
-        Rashedul Haque
-      </a>
-      <button class="topnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-      <div class="topnav-links" id="navLinks">
-        <a href="index.html">Home</a>
-        <a href="projects.html">Projects</a>
-        <a href="resume.html">Resume</a>
-        <a href="blog.html">Blog</a>
-        <a href="contact.html">Contact</a>
-        <span id="authNav" class="topnav-auth"><a href="login.html">Login</a></span>
-      </div>
+  <nav class="mainnav" id="mainnav">
+  <div class="mainnav-inner">
+    <a class="mainnav-brand" href="index.html">
+      <span class="mainnav-brand-badge">RH</span>
+      Rashedul Haque
+    </a>
+    <button class="mainnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="mainnav-links" id="navLinks">
+      <a href="index.html#about" data-target="about" data-anchor="true">About</a>
+      <a href="index.html#skills" data-target="skills" data-anchor="true">Skills</a>
+      <a href="index.html#experience" data-target="experience" data-anchor="true">Experience</a>
+      <a href="index.html#services" data-target="services" data-anchor="true">Services</a>
+      <a href="index.html#portfolio" data-target="portfolio" data-anchor="true">Portfolio</a>
+      <a href="index.html#testimonial" data-target="testimonial" data-anchor="true">Testimonial</a>
+      <a href="index.html#newsletter" data-target="newsletter" data-anchor="true">Newsletter</a>
+      <a href="projects.html" data-target="projects" data-page="projects.html">Projects</a>
+      <a href="resume.html" data-target="resume" data-page="resume.html">Resume</a>
+      <a href="blog.html" data-target="blog" data-page="blog.html">Blog</a>
+      <a href="index.html#contact" data-target="contact" data-anchor="true">Contact</a>
+      <a href="admin-login.html" data-target="admin-login.html" data-page="admin-login.html">Admin</a>
+      <span id="authNav" class="mainnav-auth"><a href="login.html">Login</a></span>
     </div>
-  </nav>
+  </div>
+</nav>
   <section class="login-wrap">
     <h1>Admin Login</h1>
     <form id="loginForm">
@@ -58,6 +73,6 @@
   </section>
   <script type="module" src="js/admin-login.js"></script>
   <script type="module" src="js/auth-nav.js"></script>
-  <script src="js/nav.js"></script>
+  <script src="js/mainnav.js"></script>
 </body>
 </html>

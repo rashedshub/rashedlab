@@ -7,28 +7,35 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="portfolio.css"/>
-<link rel="stylesheet" href="css/topnav.css"/>
+<link rel="stylesheet" href="css/mainnav.css"/>
 </head>
 <body>
-  <nav class="topnav" id="topnav">
-            <div class="topnav-inner">
-                <a class="topnav-brand" href="index.html">
-                    <span class="topnav-brand-badge">RH</span>
-                    Rashedul Haque
-                </a>
-                <button class="topnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
-                    <span></span><span></span><span></span>
-                </button>
-                <div class="topnav-links" id="navLinks">
-                    <a href="index.html">Home</a>
-                    <a href="projects.html">Projects</a>
-                    <a href="resume.html">Resume</a>
-                    <a href="blog.html" class="active">Blog</a>
-                    <a href="contact.html">Contact</a>
-                    <span id="authNav" class="topnav-auth"><a href="login.html">Login</a></span>
-                </div>
-            </div>
-        </nav>
+  <nav class="mainnav" id="mainnav">
+  <div class="mainnav-inner">
+    <a class="mainnav-brand" href="index.html">
+      <span class="mainnav-brand-badge">RH</span>
+      Rashedul Haque
+    </a>
+    <button class="mainnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="mainnav-links" id="navLinks">
+      <a href="index.html#about" data-target="about" data-anchor="true">About</a>
+      <a href="index.html#skills" data-target="skills" data-anchor="true">Skills</a>
+      <a href="index.html#experience" data-target="experience" data-anchor="true">Experience</a>
+      <a href="index.html#services" data-target="services" data-anchor="true">Services</a>
+      <a href="index.html#portfolio" data-target="portfolio" data-anchor="true">Portfolio</a>
+      <a href="index.html#testimonial" data-target="testimonial" data-anchor="true">Testimonial</a>
+      <a href="index.html#newsletter" data-target="newsletter" data-anchor="true">Newsletter</a>
+      <a href="projects.html" data-target="projects" data-page="projects.html">Projects</a>
+      <a href="resume.html" data-target="resume" data-page="resume.html">Resume</a>
+      <a href="blog.html" data-target="blog" data-page="blog.html">Blog</a>
+      <a href="index.html#contact" data-target="contact" data-anchor="true">Contact</a>
+      <a href="admin-login.html" data-target="admin-login.html" data-page="admin-login.html">Admin</a>
+      <span id="authNav" class="mainnav-auth"><a href="login.html">Login</a></span>
+    </div>
+  </div>
+</nav>
 <section class="page-section">
   <h1>Blog</h1>
   <p>Thoughts on HR analytics, people strategy, and workplace culture.</p>
@@ -37,6 +44,6 @@
 <footer class="site-footer"><p>&copy; 2026 Md. Rashedul Haque.</p></footer>
 <script type="module" src="js/auth-nav.js"></script>
 <script type="module" src="js/blog.js"></script>
-<script src="js/nav.js"></script>
+<script src="js/mainnav.js"></script>
 </body>
 </html>

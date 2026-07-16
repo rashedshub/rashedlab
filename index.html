@@ -31,8 +31,8 @@
         <link href="css/style.css" rel="stylesheet">
 
         <!-- Top Navbar Stylesheet (links to the rest of the site) -->
-        <link href="css/topnav.css" rel="stylesheet">
-    </head>
+        <link href="css/mainnav.css" rel="stylesheet">
+            </head>
 
     <body>
         <!-- Spinner Start -->
@@ -44,25 +44,32 @@
         <!-- Spinner End -->
 
         <!-- Top Navbar Start -->
-        <nav class="topnav" id="topnav">
-            <div class="topnav-inner">
-                <a class="topnav-brand" href="index.html">
-                    <span class="topnav-brand-badge">RH</span>
-                    Rashedul Haque
-                </a>
-                <button class="topnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
-                    <span></span><span></span><span></span>
-                </button>
-                <div class="topnav-links" id="navLinks">
-                    <a href="index.html" class="active">Home</a>
-                    <a href="projects.html">Projects</a>
-                    <a href="resume.html">Resume</a>
-                    <a href="blog.html">Blog</a>
-                    <a href="contact.html">Contact</a>
-                    <span id="authNav" class="topnav-auth"><a href="login.html">Login</a></span>
-                </div>
-            </div>
-        </nav>
+        <nav class="mainnav" id="mainnav">
+  <div class="mainnav-inner">
+    <a class="mainnav-brand" href="index.html">
+      <span class="mainnav-brand-badge">RH</span>
+      Rashedul Haque
+    </a>
+    <button class="mainnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="mainnav-links" id="navLinks">
+      <a href="#about" data-target="about" data-anchor="true">About</a>
+      <a href="#skills" data-target="skills" data-anchor="true">Skills</a>
+      <a href="#experience" data-target="experience" data-anchor="true">Experience</a>
+      <a href="#services" data-target="services" data-anchor="true">Services</a>
+      <a href="#portfolio" data-target="portfolio" data-anchor="true">Portfolio</a>
+      <a href="#testimonial" data-target="testimonial" data-anchor="true">Testimonial</a>
+      <a href="#newsletter" data-target="newsletter" data-anchor="true">Newsletter</a>
+      <a href="projects.html" data-target="projects" data-page="projects.html">Projects</a>
+      <a href="resume.html" data-target="resume" data-page="resume.html">Resume</a>
+      <a href="blog.html" data-target="blog" data-page="blog.html">Blog</a>
+      <a href="#contact" data-target="contact" data-anchor="true">Contact</a>
+      <a href="admin-login.html" data-target="admin-login.html" data-page="admin-login.html">Admin</a>
+      <span id="authNav" class="mainnav-auth"><a href="login.html">Login</a></span>
+    </div>
+  </div>
+</nav>
         <!-- Top Navbar End -->
 
         <div class="container">
@@ -88,8 +95,7 @@
                     </div>
                 </div>
                 <div class="col-lg-8">
-                    <!-- About Start -->
-                    <section class="py-5 border-bottom wow fadeInUp" data-wow-delay="0.1s">
+                    <section class="py-5 border-bottom wow fadeInUp" data-wow-delay="0.1s" id="about">
                         <h1 class="title pb-3 mb-5">About Me</h1>
                         <p id="aboutBio">I am a passionate Human Resources professional with a strong background in HR operations, data analytics, and strategic business partnering. Currently serving as a Strategic Partner at Youngone Hi-Tech (Dhaka EPZ), I focus on aligning people strategies with organizational goals, driving employee engagement, and supporting leadership in building a high-performing culture.</p>
                         <div class="row mb-4">
@@ -151,7 +157,7 @@
                     <!-- About End -->
 
                     <!-- Skills Start -->
-                    <section class="py-5 border-bottom wow fadeInUp" data-wow-delay="0.1s">
+                    <section class="py-5 border-bottom wow fadeInUp" data-wow-delay="0.1s" id="skills">
                         <h1 class="title pb-3 mb-5">Skills</h1>
                         <div class="row" id="skillsContainer">
                             <!-- populated by js/home.js from Firestore; falls back to defaults below if empty -->
@@ -160,7 +166,7 @@
                     <!-- Skills End -->
 
                     <!-- Expericence Start -->
-                    <section class="py-5 wow fadeInUp" data-wow-delay="0.1s">
+                    <section class="py-5 wow fadeInUp" data-wow-delay="0.1s" id="experience">
                         <h1 class="title pb-3 mb-5">Experience</h1>
                         <div class="border-start border-2 border-light pt-2 ps-5" id="experienceContainer">
                             <!-- populated by js/home.js from Firestore; falls back to defaults below if empty -->
@@ -169,117 +175,40 @@
                     <!-- Expericence End -->
 
                     <!-- Subscribe Start -->
-                    <section class="wow fadeInUp" data-wow-delay="0.1s">
+                    <section class="wow fadeInUp" data-wow-delay="0.1s" id="newsletter">
                         <div class="bg-secondary text-center p-5">
                             <h1 class="text-white font-weight-bold">Subscribe My Newsletter</h1>
                             <p class="text-white">Subscribe and get my latest article in your inbox</p>
-                            <div class="position-relative w-100">
-                                <input class="form-control bg-dark border-0 w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email">
-                                <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">Subscribe</button>
-                            </div>
+                            <form id="newsletterForm" class="position-relative w-100">
+                                <input class="form-control bg-dark border-0 w-100 py-3 ps-4 pe-5" type="email" id="newsletterEmail" placeholder="Your email" required>
+                                <button type="submit" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">Subscribe</button>
+                            </form>
+                            <p id="newsletterMsg" class="text-white mt-2 mb-0"></p>
                         </div>
                     </section>
                     <!-- Subscribe End -->
 
                     <!-- Services Start -->
-                    <section class="py-5 border-bottom wow fadeInUp" data-wow-delay="0.1s">
+                    <section class="py-5 border-bottom wow fadeInUp" data-wow-delay="0.1s" id="services">
                         <h1 class="title pb-3 mb-5">Services</h1>
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <div class="service-item">
-                                    <i class="fa fa-2x fa-laptop-code mx-auto mb-4"></i>
-                                    <h5 class="mb-2">Web Design</h5>
-                                    <p class="mb-0">Justo sit justo eos amet tempor amet clita amet ipsum eos elitr. Amet lorem lorem lorem est amet labore</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="service-item">
-                                    <i class="fab fa-2x fa-android mx-auto mb-4"></i>
-                                    <h5 class="mb-2">Apps Development</h5>
-                                    <p class="mb-0">Justo sit justo eos amet tempor amet clita amet ipsum eos elitr. Amet lorem lorem lorem est amet labore</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="service-item">
-                                    <i class="fa fa-2x fa-search mx-auto mb-4"></i>
-                                    <h5 class="mb-2">SEO</h5>
-                                    <p class="mb-0">Justo sit justo eos amet tempor amet clita amet ipsum eos elitr. Amet lorem lorem lorem est amet labore</p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="service-item">
-                                    <i class="fa fa-2x fa-edit mx-auto mb-4"></i>
-                                    <h5 class="mb-2">Content Creating</h5>
-                                    <p class="mb-0">Justo sit justo eos amet tempor amet clita amet ipsum eos elitr. Amet lorem lorem lorem est amet labore</p>
-                                </div>
-                            </div>
+                        <div class="row g-4" id="servicesContainer">
+                            <!-- populated by js/home.js from Firestore; falls back to defaults if empty -->
                         </div>
                     </section>
                     <!-- Services End -->
 
                     <!-- Portfolio Start -->
-                    <section class="py-5 border-bottom wow fadeInUp" data-wow-delay="0.1s">
+                    <section class="py-5 border-bottom wow fadeInUp" data-wow-delay="0.1s" id="portfolio">
                         <h1 class="title pb-3 mb-5">Portfolio</h1>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="row">
-                                    <div class="col-12 text-center mb-2">
-                                        <ul class="list-inline mb-4" id="portfolio-flters">
-                                            <li class="btn btn-secondary active"  data-filter="*"><i class="fa fa-star me-2"></i>All</li>
-                                            <li class="btn btn-secondary" data-filter=".first"><i class="fa fa-laptop-code me-2"></i>Design</li>
-                                            <li class="btn btn-secondary" data-filter=".second"><i class="fa fa-mobile-alt me-2"></i>Development</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="row portfolio-container">
-                                    <div class="col-md-6 mb-4 portfolio-item first">
-                                        <div class="position-relative overflow-hidden mb-2">
-                                            <img class="img-fluid w-100" src="img/portfolio-1.jpg" alt="">
-                                            <div class="portfolio-btn d-flex align-items-center justify-content-center">
-                                                <a href="img/portfolio-1.jpg" data-lightbox="portfolio">
-                                                    <i class="bi bi-plus text-light"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-4 portfolio-item second">
-                                        <div class="position-relative overflow-hidden mb-2">
-                                            <img class="img-fluid w-100" src="img/portfolio-2.jpg" alt="">
-                                            <div class="portfolio-btn d-flex align-items-center justify-content-center">
-                                                <a href="img/portfolio-2.jpg" data-lightbox="portfolio">
-                                                    <i class="bi bi-plus text-light"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-4 portfolio-item first">
-                                        <div class="position-relative overflow-hidden mb-2">
-                                            <img class="img-fluid w-100" src="img/portfolio-3.jpg" alt="">
-                                            <div class="portfolio-btn d-flex align-items-center justify-content-center">
-                                                <a href="img/portfolio-3.jpg" data-lightbox="portfolio">
-                                                    <i class="bi bi-plus text-light"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-4 portfolio-item second">
-                                        <div class="position-relative overflow-hidden mb-2">
-                                            <img class="img-fluid w-100" src="img/portfolio-4.jpg" alt="">
-                                            <div class="portfolio-btn d-flex align-items-center justify-content-center">
-                                                <a href="img/portfolio-4.jpg" data-lightbox="portfolio">
-                                                    <i class="bi bi-plus text-light"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <p style="color:rgba(242,242,242,0.65);margin-top:-16px;margin-bottom:24px;">A visual look at the work featured on the <a href="projects.html">Projects page</a>.</p>
+                        <div class="row portfolio-container" id="portfolioContainer">
+                            <!-- populated by js/home.js from the same "projects" collection as projects.html -->
                         </div>
                     </section>
                     <!-- Portfolio End -->
 
                     <!-- Testimonial Start -->
-                    <section class="py-5 border-bottom wow fadeInUp" data-wow-delay="0.1s">
+                    <section class="py-5 border-bottom wow fadeInUp" data-wow-delay="0.1s" id="testimonial">
                         <h1 class="title pb-3 mb-5">Testimonial</h1>
                         <div class="owl-carousel testimonial-carousel">
                             <div class="text-left">
@@ -322,18 +251,17 @@
                     <!-- Contact Start -->
                     <section class="py-5 wow fadeInUp" data-wow-delay="0.1s" id="contact">
                         <h1 class="title pb-3 mb-5">Contact Me</h1>
-						<h4 class="mb-4">Receive messages instantly with our PHP and Ajax contact form - available in the <a href="https://htmlcodex.com/downloading/?item=2122">Pro Version</a> only.</h4>
-                        <form>
+                        <form id="contactForm">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control border-0 bg-secondary" id="name" placeholder="Your Name">
+                                        <input type="text" class="form-control border-0 bg-secondary" id="name" placeholder="Your Name" required>
                                         <label for="name">Your Name</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <input type="email" class="form-control border-0 bg-secondary" id="email" placeholder="Your Email">
+                                        <input type="email" class="form-control border-0 bg-secondary" id="email" placeholder="Your Email" required>
                                         <label for="email">Your Email</label>
                                     </div>
                                 </div>
@@ -345,7 +273,7 @@
                                 </div>
                                 <div class="col-12">
                                     <div class="form-floating">
-                                        <textarea class="form-control border-0 bg-secondary" placeholder="Leave a message here" id="message" style="height: 200px"></textarea>
+                                        <textarea class="form-control border-0 bg-secondary" placeholder="Leave a message here" id="message" style="height: 200px" required></textarea>
                                         <label for="message">Message</label>
                                     </div>
                                 </div>
@@ -354,6 +282,7 @@
                                 </div>
                             </div>
                         </form>
+                        <p id="contactMsg" class="mt-3"></p>
                     </section>
                     <!-- Contact End -->
 
@@ -405,6 +334,7 @@
         <!-- Top Navbar Javascript (shared with the rest of the site) -->
         <script type="module" src="js/auth-nav.js"></script>
         <script type="module" src="js/home.js"></script>
-        <script src="js/nav.js"></script>
+        <script type="module" src="js/home-contact.js"></script>
+        <script src="js/mainnav.js"></script>
     </body>
 </html>

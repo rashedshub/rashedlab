@@ -1,0 +1,168 @@
+/* ── Unified site nav — floating pill, top of every page ─────────
+   Merges the old topnav (brand + page links + auth) with the
+   in-page scrolling tabs (About/Skills/Experience/Contact anchors),
+   so there is only ONE nav bar, ever. */
+
+html { scroll-behavior: smooth; }
+
+.mainnav {
+  --mn-bg: rgba(28, 40, 51, 0.82);
+  --mn-bg-solid: #2C3E50;
+  --mn-accent: #00B87B;
+  --mn-accent-hover: #00d38c;
+  --mn-text: #F2F2F2;
+  --mn-text-dim: rgba(242, 242, 242, 0.7);
+  --mn-border: rgba(255, 255, 255, 0.08);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  padding: 16px 20px 0;
+  pointer-events: none;
+}
+
+.mainnav-inner {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 1180px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--mn-bg);
+  border: 1px solid var(--mn-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 100px;
+  padding: 7px 7px 7px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.mainnav-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--mn-text);
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.mainnav-brand-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--mn-accent);
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.mainnav-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.mainnav-links::-webkit-scrollbar { display: none; }
+
+.mainnav-links a {
+  position: relative;
+  color: var(--mn-text-dim);
+  padding: 9px 12px;
+  border-radius: 100px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.mainnav-links a:hover { color: var(--mn-text); background: rgba(255,255,255,0.08); }
+.mainnav-links a.active { color: #fff; background: var(--mn-accent); }
+
+.mainnav-auth { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.mainnav-auth a { color: var(--mn-text-dim); text-decoration: none; padding: 9px 14px; border-radius: 100px; font-size: 0.85rem; font-weight: 500; transition: color 0.2s ease, background 0.2s ease; }
+.mainnav-auth a:hover { color: var(--mn-text); background: rgba(255,255,255,0.08); }
+.mainnav-auth a[href="login.html"],
+.mainnav-auth a#logoutLink { background: var(--mn-accent); color: #fff; }
+.mainnav-auth a[href="login.html"]:hover,
+.mainnav-auth a#logoutLink:hover { background: var(--mn-accent-hover); }
+
+.mainnav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.mainnav-toggle span {
+  display: block;
+  width: 15px;
+  height: 2px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.mainnav-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.mainnav-toggle.open span:nth-child(2) { opacity: 0; }
+.mainnav-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* Push page content below the fixed nav on every page */
+body { padding-top: 96px; }
+.sticky-lg-top { top: 96px !important; }
+
+/* Scroll-anchored sections land below the fixed nav, not under it */
+section[id] { scroll-margin-top: 112px; }
+
+@media (max-width: 991.98px) { .sticky-lg-top { top: auto !important; } }
+
+@media (max-width: 860px) {
+  .mainnav-toggle { display: flex; }
+
+  .mainnav-links {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    background: var(--mn-bg-solid);
+    border: 1px solid var(--mn-border);
+    border-radius: 20px;
+    padding: 10px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  .mainnav-links.open { opacity: 1; visibility: visible; transform: translateY(0); }
+  .mainnav-links a, .mainnav-auth { display: block; text-align: center; padding: 12px 16px; }
+  .mainnav-auth { display: flex; flex-direction: column; gap: 2px; }
+
+  body { padding-top: 84px; }
+}

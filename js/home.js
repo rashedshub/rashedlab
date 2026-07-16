@@ -1,5 +1,5 @@
 import { app } from "./firebase.js";
-import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, getDocs, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const db = getFirestore(app);
 
@@ -101,4 +101,85 @@ const DEFAULT_EXPERIENCE = [
       <p>${e.description || ""}</p>
     </div>
   `).join("");
+})();
+
+/* ── Services ────────────────────────────────────────────── */
+const DEFAULT_SERVICES = [
+  { icon: "fa-people-arrows", title: "HR Strategy Consulting", description: "Aligning people strategy with business goals — workforce planning, org design, and capability building." },
+  { icon: "fa-money-check-alt", title: "Payroll & Compliance", description: "End-to-end payroll operations at scale, with 100% compliance across large, multi-site workforces." },
+  { icon: "fa-network-wired", title: "HRMS Implementation", description: "Leading HRMS rollouts and automation projects that improve data accuracy and reporting speed." },
+  { icon: "fa-chalkboard-teacher", title: "Learning & Development", description: "Designing training programs, from onboarding to leadership development and compliance training." }
+];
+
+(async () => {
+  const container = document.getElementById("servicesContainer");
+  if (!container) return;
+  let services = DEFAULT_SERVICES;
+  try {
+    const snap = await getDocs(collection(db, "services"));
+    if (!snap.empty) services = snap.docs.map(d => d.data());
+  } catch (err) { /* keep defaults */ }
+
+  container.innerHTML = services.map(s => `
+    <div class="col-md-6">
+      <div class="service-item">
+        <i class="fa fa-2x ${s.icon || 'fa-briefcase'} mx-auto mb-4"></i>
+        <h5 class="mb-2">${s.title || ""}</h5>
+        <p class="mb-0">${s.description || ""}</p>
+      </div>
+    </div>
+  `).join("");
+})();
+
+/* ── Portfolio (reuses the same "projects" collection as projects.html) ── */
+(async () => {
+  const container = document.getElementById("portfolioContainer");
+  if (!container) return;
+  try {
+    const snap = await getDocs(collection(db, "projects"));
+    if (snap.empty) {
+      container.innerHTML = `<p style="color:rgba(242,242,242,0.6);">No projects added yet — add some from the admin panel.</p>`;
+      return;
+    }
+    container.innerHTML = snap.docs.map(d => {
+      const p = d.data();
+      return `
+        <div class="col-md-6 mb-4">
+          <div class="position-relative overflow-hidden mb-2" style="background:var(--secondary);border-radius:6px;">
+            ${p.image
+              ? `<img class="img-fluid w-100" src="${p.image}" alt="${p.title || ''}" style="aspect-ratio:16/10;object-fit:cover;">`
+              : `<div style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;"><i class="fa fa-2x fa-briefcase text-primary"></i></div>`}
+            <div class="portfolio-btn d-flex align-items-center justify-content-center">
+              ${p.link ? `<a href="${p.link}" target="_blank" rel="noopener"><i class="bi bi-plus text-light"></i></a>` : ""}
+            </div>
+          </div>
+          <h6 class="mb-0">${p.title || ""}</h6>
+        </div>
+      `;
+    }).join("");
+  } catch (err) {
+    console.error("Failed to load portfolio:", err);
+  }
+})();
+
+/* ── Newsletter ──────────────────────────────────────────── */
+(() => {
+  const form = document.getElementById("newsletterForm");
+  if (!form) return;
+  const msg = document.getElementById("newsletterMsg");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("newsletterEmail").value.trim();
+    if (!email) return;
+    msg.textContent = "Subscribing…";
+    try {
+      await addDoc(collection(db, "newsletter_subscribers"), { email, createdAt: Date.now() });
+      msg.textContent = "Thanks for subscribing!";
+      form.reset();
+    } catch (err) {
+      console.error("Newsletter signup failed:", err);
+      msg.textContent = "Something went wrong. Please try again.";
+    }
+  });
 })();

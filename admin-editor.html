@@ -9,7 +9,7 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 <link href="css/bootstrap.min.css" rel="stylesheet">
 <link href="css/style.css" rel="stylesheet">
-<link href="css/topnav.css" rel="stylesheet">
+<link href="css/mainnav.css" rel="stylesheet">
 <style>
   body { background: var(--dark); color: var(--light); font-family: 'Heebo', sans-serif; }
   .editor-wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
@@ -44,10 +44,23 @@
   label { display:block; margin-top:14px; margin-bottom:5px; color: rgba(242,242,242,0.6); font-size:0.85rem; font-weight:500; }
 
   .form-control, textarea.form-control, input.form-control {
-    width:100%; padding:11px 14px; background: var(--dark); border:1px solid rgba(255,255,255,0.12);
-    border-radius:6px; color: var(--light); font-family:inherit; font-size:0.92rem;
+    width:100%; padding:11px 14px; background: var(--dark) !important; border:1px solid rgba(255,255,255,0.12) !important;
+    border-radius:6px; color: var(--light) !important; font-family:inherit; font-size:0.92rem;
   }
-  .form-control:focus { outline:none; border-color: var(--primary); }
+  .form-control:focus { outline:none; border-color: var(--primary) !important; box-shadow: none !important; }
+
+  /* Chrome/Safari/Edge force a white background on autofilled fields
+     (name, email, phone) unless overridden like this */
+  .form-control:-webkit-autofill,
+  .form-control:-webkit-autofill:hover,
+  .form-control:-webkit-autofill:focus,
+  .form-control:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px var(--dark) inset !important;
+    box-shadow: 0 0 0 1000px var(--dark) inset !important;
+    -webkit-text-fill-color: var(--light) !important;
+    caret-color: var(--light);
+    transition: background-color 5000s ease-in-out 0s;
+  }
 
   .btn-save {
     background: var(--primary); color:#fff; border:none; padding:11px 26px; border-radius:6px;
@@ -71,22 +84,29 @@
 </style>
 </head>
 <body>
-<nav class="topnav" id="topnav">
-  <div class="topnav-inner">
-    <a class="topnav-brand" href="index.html">
-      <span class="topnav-brand-badge">RH</span>
+<nav class="mainnav" id="mainnav">
+  <div class="mainnav-inner">
+    <a class="mainnav-brand" href="index.html">
+      <span class="mainnav-brand-badge">RH</span>
       Rashedul Haque
     </a>
-    <button class="topnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+    <button class="mainnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
-    <div class="topnav-links" id="navLinks">
-      <a href="index.html">Home</a>
-      <a href="projects.html">Projects</a>
-      <a href="resume.html">Resume</a>
-      <a href="blog.html">Blog</a>
-      <a href="contact.html">Contact</a>
-      <span id="authNav" class="topnav-auth"><a href="login.html">Login</a></span>
+    <div class="mainnav-links" id="navLinks">
+      <a href="index.html#about" data-target="about" data-anchor="true">About</a>
+      <a href="index.html#skills" data-target="skills" data-anchor="true">Skills</a>
+      <a href="index.html#experience" data-target="experience" data-anchor="true">Experience</a>
+      <a href="index.html#services" data-target="services" data-anchor="true">Services</a>
+      <a href="index.html#portfolio" data-target="portfolio" data-anchor="true">Portfolio</a>
+      <a href="index.html#testimonial" data-target="testimonial" data-anchor="true">Testimonial</a>
+      <a href="index.html#newsletter" data-target="newsletter" data-anchor="true">Newsletter</a>
+      <a href="projects.html" data-target="projects" data-page="projects.html">Projects</a>
+      <a href="resume.html" data-target="resume" data-page="resume.html">Resume</a>
+      <a href="blog.html" data-target="blog" data-page="blog.html">Blog</a>
+      <a href="index.html#contact" data-target="contact" data-anchor="true">Contact</a>
+      <a href="admin-login.html" data-target="admin-login.html" data-page="admin-login.html">Admin</a>
+      <span id="authNav" class="mainnav-auth"><a href="login.html">Login</a></span>
     </div>
   </div>
 </nav>
@@ -102,9 +122,11 @@
     <button data-panel="about" class="active">About Me</button>
     <button data-panel="skills">Skills</button>
     <button data-panel="experience">Experience</button>
+    <button data-panel="services">Services</button>
     <button data-panel="projects">Projects</button>
     <button data-panel="blog">Blog</button>
     <button data-panel="messages">Messages</button>
+    <button data-panel="newsletter">Newsletter</button>
   </div>
 
   <!-- ABOUT ME -->
@@ -243,9 +265,35 @@
     <h3 style="color:#fff;">Contact Messages</h3>
     <div id="messageList"></div>
   </div>
+
+  <!-- SERVICES -->
+  <div class="panel" id="panel-services">
+    <div class="panel-card">
+      <h3>Add / Edit Service</h3>
+      <input type="hidden" id="serviceId"/>
+      <label>Title</label>
+      <input type="text" class="form-control" id="serviceTitle"/>
+      <label>Description</label>
+      <textarea class="form-control" id="serviceDescription" rows="3"></textarea>
+      <label>Icon — <a href="https://fontawesome.com/v5/search?m=free" target="_blank" rel="noopener" style="color:var(--primary);">browse Font Awesome icons</a> (e.g. fa-briefcase, fa-chart-line)</label>
+      <input type="text" class="form-control" id="serviceIcon" placeholder="fa-briefcase"/>
+      <button class="btn-save" id="saveService">Save Service</button>
+      <button class="btn-clear" id="clearServiceForm" type="button">Clear / New</button>
+      <p class="save-msg" id="serviceMsg"></p>
+    </div>
+    <h3 style="color:#fff;">Existing Services</h3>
+    <div id="serviceList"></div>
+  </div>
+
+  <!-- NEWSLETTER -->
+  <div class="panel" id="panel-newsletter">
+    <h3 style="color:#fff;">Newsletter Subscribers</h3>
+    <p style="color:rgba(242,242,242,0.6);">Read-only — collected automatically from the Home page subscribe form.</p>
+    <div id="newsletterList"></div>
+  </div>
 </div>
 <script type="module" src="js/admin-editor.js"></script>
 <script type="module" src="js/auth-nav.js"></script>
-<script src="js/nav.js"></script>
+<script src="js/mainnav.js"></script>
 </body>
 </html>
