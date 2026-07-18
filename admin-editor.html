@@ -133,10 +133,17 @@
       <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
         <img id="profilePreview" src="img/profile.jpg" alt="Profile preview"
              style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);"/>
-        <div>
+        <div style="flex:1;min-width:240px;">
           <input type="file" id="profileFile" accept="image/*" class="form-control" style="max-width:280px;"/>
           <button class="btn-save" id="uploadProfile" type="button" style="margin-top:10px;">Upload Photo</button>
           <p class="save-msg" id="profileMsg"></p>
+
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);">
+            <label style="margin-top:0;">Or paste an image link (from Imgur, Google Drive, another site, etc.)</label>
+            <input type="text" class="form-control" id="profileUrl" placeholder="https://example.com/photo.jpg"/>
+            <button class="btn-save" id="saveProfileUrl" type="button" style="margin-top:10px;">Use This Link</button>
+            <p class="save-msg" id="profileUrlMsg"></p>
+          </div>
         </div>
       </div>
     </div>

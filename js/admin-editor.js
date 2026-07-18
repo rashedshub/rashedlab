@@ -58,7 +58,10 @@ async function loadAbout() {
   el("aboutAvailability").value = d.availability || "";
   el("aboutBio").value = d.bio || "";
   el("aboutTypedRoles").value = d.typedRoles || "";
-  if (d.photoURL) el("profilePreview").src = d.photoURL;
+  if (d.photoURL) {
+    el("profilePreview").src = d.photoURL;
+    el("profileUrl").value = d.photoURL;
+  }
 }
 
 // Show a local preview immediately when a file is chosen
@@ -96,6 +99,34 @@ el("uploadProfile").addEventListener("click", async () => {
     el("profileMsg").textContent = err.code === "storage/unauthorized"
       ? "Upload failed — permission denied. Check your Firebase Storage rules."
       : `Upload failed: ${err.message}`;
+  }
+});
+
+el("saveProfileUrl").addEventListener("click", async () => {
+  const url = el("profileUrl").value.trim();
+  if (!url) {
+    el("profileUrlMsg").style.color = "#ff8080";
+    el("profileUrlMsg").textContent = "Paste an image link first.";
+    return;
+  }
+  try {
+    new URL(url);
+  } catch {
+    el("profileUrlMsg").style.color = "#ff8080";
+    el("profileUrlMsg").textContent = "That doesn't look like a valid URL.";
+    return;
+  }
+  el("profileUrlMsg").style.color = "";
+  el("profileUrlMsg").textContent = "Saving…";
+  try {
+    await setDoc(doc(db, "site_content", "home"), { photoURL: url }, { merge: true });
+    el("profilePreview").src = url;
+    el("profileUrlMsg").textContent = "Photo updated.";
+    setTimeout(() => el("profileUrlMsg").textContent = "", 2500);
+  } catch (err) {
+    console.error("Failed to save photo URL:", err);
+    el("profileUrlMsg").style.color = "#ff8080";
+    el("profileUrlMsg").textContent = `Save failed: ${err.message}`;
   }
 });
 
