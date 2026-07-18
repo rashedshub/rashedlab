@@ -57,6 +57,7 @@ async function loadAbout() {
   el("aboutEmail").value = d.email || "";
   el("aboutAvailability").value = d.availability || "";
   el("aboutBio").value = d.bio || "";
+  el("aboutTypedRoles").value = d.typedRoles || "";
   if (d.photoURL) el("profilePreview").src = d.photoURL;
 }
 
@@ -110,7 +111,8 @@ el("saveAbout").addEventListener("click", async () => {
       phone: el("aboutPhone").value,
       email: el("aboutEmail").value,
       availability: el("aboutAvailability").value,
-      bio: el("aboutBio").value
+      bio: el("aboutBio").value,
+      typedRoles: el("aboutTypedRoles").value
     }, { merge: true });
     el("aboutMsg").textContent = "Saved.";
     setTimeout(() => el("aboutMsg").textContent = "", 2500);

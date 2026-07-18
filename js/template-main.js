@@ -24,15 +24,20 @@
 
 
     // Typed Initiate
-    if ($('.typed-text-output').length == 1) {
-        var typed_strings = $('.typed-text').text();
-        var typed = new Typed('.typed-text-output', {
-            strings: typed_strings.split(', '),
+    window.initTyped = function (strings) {
+        if (!strings || !strings.length || $('.typed-text-output').length !== 1) return;
+        if (window.typedInstance) { window.typedInstance.destroy(); }
+        window.typedInstance = new Typed('.typed-text-output', {
+            strings: strings,
             typeSpeed: 100,
             backSpeed: 20,
             smartBackspace: false,
             loop: true
         });
+    };
+    if ($('.typed-text-output').length == 1) {
+        var typed_strings = $('.typed-text').text();
+        window.initTyped(typed_strings.split(', '));
     }
 
 
