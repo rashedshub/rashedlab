@@ -99,8 +99,6 @@
       <a href="index.html#experience" data-target="experience" data-anchor="true">Experience</a>
       <a href="index.html#services" data-target="services" data-anchor="true">Services</a>
       <a href="index.html#portfolio" data-target="portfolio" data-anchor="true">Portfolio</a>
-      <a href="index.html#testimonial" data-target="testimonial" data-anchor="true">Testimonial</a>
-      <a href="index.html#newsletter" data-target="newsletter" data-anchor="true">Newsletter</a>
       <a href="projects.html" data-target="projects" data-page="projects.html">Projects</a>
       <a href="resume.html" data-target="resume" data-page="resume.html">Resume</a>
       <a href="blog.html" data-target="blog" data-page="blog.html">Blog</a>
@@ -126,11 +124,22 @@
     <button data-panel="projects">Projects</button>
     <button data-panel="blog">Blog</button>
     <button data-panel="messages">Messages</button>
-    <button data-panel="newsletter">Newsletter</button>
   </div>
 
   <!-- ABOUT ME -->
   <div class="panel active" id="panel-about">
+    <div class="panel-card">
+      <h3>Profile Picture</h3>
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+        <img id="profilePreview" src="img/profile.jpg" alt="Profile preview"
+             style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);"/>
+        <div>
+          <input type="file" id="profileFile" accept="image/*" class="form-control" style="max-width:280px;"/>
+          <button class="btn-save" id="uploadProfile" type="button" style="margin-top:10px;">Upload Photo</button>
+          <p class="save-msg" id="profileMsg"></p>
+        </div>
+      </div>
+    </div>
     <div class="panel-card">
       <h3>About Me</h3>
       <div class="field-grid">
@@ -283,13 +292,6 @@
     </div>
     <h3 style="color:#fff;">Existing Services</h3>
     <div id="serviceList"></div>
-  </div>
-
-  <!-- NEWSLETTER -->
-  <div class="panel" id="panel-newsletter">
-    <h3 style="color:#fff;">Newsletter Subscribers</h3>
-    <p style="color:rgba(242,242,242,0.6);">Read-only — collected automatically from the Home page subscribe form.</p>
-    <div id="newsletterList"></div>
   </div>
 </div>
 <script type="module" src="js/admin-editor.js"></script>

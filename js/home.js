@@ -52,6 +52,10 @@ const DEFAULT_EXPERIENCE = [
   set("infoEmail", about.email);
   set("infoAvailability", about.availability);
   set("statExperience", about.experienceYears);
+  if (about.photoURL) {
+    const photoEl = document.getElementById("sbPhoto");
+    if (photoEl) photoEl.src = about.photoURL;
+  }
 })();
 
 /* ── Skills ──────────────────────────────────────────────── */
@@ -162,24 +166,4 @@ const DEFAULT_SERVICES = [
   }
 })();
 
-/* ── Newsletter ──────────────────────────────────────────── */
-(() => {
-  const form = document.getElementById("newsletterForm");
-  if (!form) return;
-  const msg = document.getElementById("newsletterMsg");
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("newsletterEmail").value.trim();
-    if (!email) return;
-    msg.textContent = "Subscribing…";
-    try {
-      await addDoc(collection(db, "newsletter_subscribers"), { email, createdAt: Date.now() });
-      msg.textContent = "Thanks for subscribing!";
-      form.reset();
-    } catch (err) {
-      console.error("Newsletter signup failed:", err);
-      msg.textContent = "Something went wrong. Please try again.";
-    }
-  });
-})();

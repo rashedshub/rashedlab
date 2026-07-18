@@ -6,9 +6,13 @@ import {
   getFirestore, doc, getDoc, setDoc,
   collection, getDocs, addDoc, updateDoc, deleteDoc, orderBy, query
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import {
+  getStorage, ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
 
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 const el = (id) => document.getElementById(id);
 
 // ── Auth guard ──────────────────────────────────────────────
@@ -26,7 +30,6 @@ onAuthStateChanged(auth, async (user) => {
   loadPosts();
   loadMessages();
   loadServices();
-  loadNewsletter();
 });
 
 el("logoutBtn").addEventListener("click", () => signOut(auth).then(() => window.location.href = "admin-login.html"));
@@ -54,7 +57,47 @@ async function loadAbout() {
   el("aboutEmail").value = d.email || "";
   el("aboutAvailability").value = d.availability || "";
   el("aboutBio").value = d.bio || "";
+  if (d.photoURL) el("profilePreview").src = d.photoURL;
 }
+
+// Show a local preview immediately when a file is chosen
+el("profileFile").addEventListener("change", () => {
+  const file = el("profileFile").files[0];
+  if (!file) return;
+  el("profilePreview").src = URL.createObjectURL(file);
+});
+
+el("uploadProfile").addEventListener("click", async () => {
+  const file = el("profileFile").files[0];
+  if (!file) {
+    el("profileMsg").style.color = "#ff8080";
+    el("profileMsg").textContent = "Choose an image file first.";
+    return;
+  }
+  if (!file.type.startsWith("image/")) {
+    el("profileMsg").style.color = "#ff8080";
+    el("profileMsg").textContent = "Please choose an image file.";
+    return;
+  }
+  el("profileMsg").style.color = "";
+  el("profileMsg").textContent = "Uploading…";
+  try {
+    const fileRef = ref(storage, `profile/profile-${Date.now()}.${file.name.split('.').pop()}`);
+    await uploadBytes(fileRef, file);
+    const url = await getDownloadURL(fileRef);
+    await setDoc(doc(db, "site_content", "home"), { photoURL: url }, { merge: true });
+    el("profilePreview").src = url;
+    el("profileMsg").textContent = "Photo updated.";
+    setTimeout(() => el("profileMsg").textContent = "", 2500);
+  } catch (err) {
+    console.error("Failed to upload photo:", err);
+    el("profileMsg").style.color = "#ff8080";
+    el("profileMsg").textContent = err.code === "storage/unauthorized"
+      ? "Upload failed — permission denied. Check your Firebase Storage rules."
+      : `Upload failed: ${err.message}`;
+  }
+});
+
 el("saveAbout").addEventListener("click", async () => {
   el("aboutMsg").style.color = "";
   el("aboutMsg").textContent = "Saving…";
@@ -68,7 +111,7 @@ el("saveAbout").addEventListener("click", async () => {
       email: el("aboutEmail").value,
       availability: el("aboutAvailability").value,
       bio: el("aboutBio").value
-    });
+    }, { merge: true });
     el("aboutMsg").textContent = "Saved.";
     setTimeout(() => el("aboutMsg").textContent = "", 2500);
   } catch (err) {
@@ -424,23 +467,4 @@ el("saveService").addEventListener("click", async () => {
   }
 });
 
-// ── Newsletter (read-only) ─────────────────────────────────
-async function loadNewsletter() {
-  const list = el("newsletterList");
-  try {
-    const snap = await getDocs(query(collection(db, "newsletter_subscribers"), orderBy("createdAt", "desc")));
-    list.innerHTML = "";
-    if (snap.empty) { list.innerHTML = "<p style='color:rgba(242,242,242,0.6);'>No subscribers yet.</p>"; return; }
-    snap.forEach(d => {
-      const s = d.data();
-      const row = document.createElement("div");
-      row.className = "item-row";
-      row.innerHTML = `<strong>${s.email || ""}</strong>
-        <p>${s.createdAt ? new Date(s.createdAt).toLocaleString() : ""}</p>`;
-      list.appendChild(row);
-    });
-  } catch (err) {
-    console.error("Failed to load subscribers:", err);
-    list.innerHTML = "<p style='color:#ff8080;'>Couldn't load subscribers — check Firestore rules for newsletter_subscribers.</p>";
-  }
-}
+
