@@ -92,6 +92,14 @@ html { scroll-behavior: smooth; }
 .mainnav-links a:hover { color: var(--mn-text); background: rgba(255,255,255,0.08); }
 .mainnav-links a.active { color: #fff; background: var(--mn-accent); }
 
+.mainnav-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 6px 6px;
+  background: rgba(255,255,255,0.14);
+  flex-shrink: 0;
+}
+
 .mainnav-auth { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .mainnav-auth a { color: var(--mn-text-dim); text-decoration: none; padding: 9px 14px; border-radius: 100px; font-size: 0.85rem; font-weight: 500; transition: color 0.2s ease, background 0.2s ease; }
 .mainnav-auth a:hover { color: var(--mn-text); background: rgba(255,255,255,0.08); }
@@ -163,6 +171,7 @@ section[id] { scroll-margin-top: 112px; }
   .mainnav-links.open { opacity: 1; visibility: visible; transform: translateY(0); }
   .mainnav-links a, .mainnav-auth { display: block; text-align: center; padding: 12px 16px; }
   .mainnav-auth { display: flex; flex-direction: column; gap: 2px; }
+  .mainnav-divider { width: auto; height: 1px; margin: 6px 10px; align-self: stretch; }
 
   body { padding-top: 84px; }
 }

@@ -58,6 +58,11 @@ async function loadAbout() {
   el("aboutAvailability").value = d.availability || "";
   el("aboutBio").value = d.bio || "";
   el("aboutTypedRoles").value = d.typedRoles || "";
+  el("socialFacebook").value = d.socialFacebook || "";
+  el("socialLinkedin").value = d.socialLinkedin || "";
+  el("socialTwitter").value = d.socialTwitter || "";
+  el("socialInstagram").value = d.socialInstagram || "";
+  el("socialGithub").value = d.socialGithub || "";
   if (d.photoURL) {
     el("profilePreview").src = d.photoURL;
     el("profileUrl").value = d.photoURL;
@@ -143,7 +148,12 @@ el("saveAbout").addEventListener("click", async () => {
       email: el("aboutEmail").value,
       availability: el("aboutAvailability").value,
       bio: el("aboutBio").value,
-      typedRoles: el("aboutTypedRoles").value
+      typedRoles: el("aboutTypedRoles").value,
+      socialFacebook: el("socialFacebook").value,
+      socialLinkedin: el("socialLinkedin").value,
+      socialTwitter: el("socialTwitter").value,
+      socialInstagram: el("socialInstagram").value,
+      socialGithub: el("socialGithub").value
     }, { merge: true });
     el("aboutMsg").textContent = "Saved.";
     setTimeout(() => el("aboutMsg").textContent = "", 2500);
@@ -364,6 +374,7 @@ function clearPostForm() {
   el("postId").value = "";
   el("postTitle").value = "";
   el("postContent").value = "";
+  el("postImage").value = "";
 }
 el("clearPostForm").addEventListener("click", clearPostForm);
 
@@ -386,6 +397,7 @@ async function loadPosts() {
     el("postId").value = b.dataset.edit;
     el("postTitle").value = p.title || "";
     el("postContent").value = p.content || "";
+    el("postImage").value = p.image || "";
   }));
   list.querySelectorAll("[data-delete]").forEach(b => b.addEventListener("click", async () => {
     if (!confirm("Delete this post? Its comments will remain but be orphaned.")) return;
@@ -396,7 +408,7 @@ async function loadPosts() {
 
 el("savePost").addEventListener("click", async () => {
   const id = el("postId").value;
-  const data = { title: el("postTitle").value, content: el("postContent").value };
+  const data = { title: el("postTitle").value, content: el("postContent").value, image: el("postImage").value };
   el("postMsg").style.color = "";
   el("postMsg").textContent = "Saving…";
   try {

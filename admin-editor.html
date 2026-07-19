@@ -99,11 +99,14 @@
       <a href="index.html#experience" data-target="experience" data-anchor="true">Experience</a>
       <a href="index.html#services" data-target="services" data-anchor="true">Services</a>
       <a href="index.html#portfolio" data-target="portfolio" data-anchor="true">Portfolio</a>
+      <a href="index.html#contact" data-target="contact" data-anchor="true">Contact</a>
+      <span class="mainnav-divider"></span>
       <a href="projects.html" data-target="projects" data-page="projects.html">Projects</a>
       <a href="resume.html" data-target="resume" data-page="resume.html">Resume</a>
       <a href="blog.html" data-target="blog" data-page="blog.html">Blog</a>
-      <a href="index.html#contact" data-target="contact" data-anchor="true">Contact</a>
+      <span class="mainnav-divider"></span>
       <a href="admin-login.html" data-target="admin-login.html" data-page="admin-login.html">Admin</a>
+      <span class="mainnav-divider"></span>
       <span id="authNav" class="mainnav-auth"><a href="login.html">Login</a></span>
     </div>
   </div>
@@ -183,7 +186,32 @@
       <textarea class="form-control" id="aboutBio" rows="6"></textarea>
       <label>Rotating Title Text (comma-separated — types out one after another under your name)</label>
       <input type="text" class="form-control" id="aboutTypedRoles" placeholder="HR Business Partner, People Strategy Leader, HR Analytics Specialist"/>
-      <button class="btn-save" id="saveAbout">Save About Me</button>
+
+      <h3 style="margin-top:24px;">Social Links <span style="color:rgba(242,242,242,0.5);font-weight:400;font-size:0.8rem;">(leave blank to hide that icon in the footer)</span></h3>
+      <div class="field-grid">
+        <div>
+          <label>Facebook</label>
+          <input type="text" class="form-control" id="socialFacebook" placeholder="https://facebook.com/yourprofile"/>
+        </div>
+        <div>
+          <label>LinkedIn</label>
+          <input type="text" class="form-control" id="socialLinkedin" placeholder="https://linkedin.com/in/yourprofile"/>
+        </div>
+        <div>
+          <label>Twitter / X</label>
+          <input type="text" class="form-control" id="socialTwitter" placeholder="https://twitter.com/yourprofile"/>
+        </div>
+        <div>
+          <label>Instagram</label>
+          <input type="text" class="form-control" id="socialInstagram" placeholder="https://instagram.com/yourprofile"/>
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label>GitHub</label>
+          <input type="text" class="form-control" id="socialGithub" placeholder="https://github.com/yourusername"/>
+        </div>
+      </div>
+
+      <button class="btn-save" id="saveAbout" style="margin-top:20px;">Save About Me</button>
       <p class="save-msg" id="aboutMsg"></p>
     </div>
   </div>
@@ -270,6 +298,8 @@
       <input type="text" class="form-control" id="postTitle"/>
       <label>Content</label>
       <textarea class="form-control" id="postContent" rows="8"></textarea>
+      <label>Featured Image URL (optional)</label>
+      <input type="text" class="form-control" id="postImage"/>
       <button class="btn-save" id="savePost">Save Post</button>
       <button class="btn-clear" id="clearPostForm" type="button">Clear / New</button>
       <p class="save-msg" id="postMsg"></p>

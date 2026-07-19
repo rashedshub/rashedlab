@@ -4,20 +4,32 @@ import { getFirestore, collection, getDocs } from "https://www.gstatic.com/fireb
 const db = getFirestore(app);
 
 (async () => {
-  const grid = document.getElementById("projectGrid");
-  const snap = await getDocs(collection(db, "projects"));
-  if (snap.empty) return; // leave placeholder cards if nothing added yet
-  grid.innerHTML = "";
-  snap.forEach(d => {
-    const p = d.data();
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      ${p.image ? `<img src="${p.image}" alt="${p.title || ''}" style="width:100%;border-radius:8px;margin-bottom:10px;"/>` : ""}
-      <h3>${p.title || "Untitled"}</h3>
-      <p>${p.description || ""}</p>
-      ${p.link ? `<a href="${p.link}" target="_blank" rel="noopener">View &rarr;</a>` : ""}
-    `;
-    grid.appendChild(card);
-  });
+  const body = document.getElementById("projectTableBody");
+  let projects = [];
+  try {
+    const snap = await getDocs(collection(db, "projects"));
+    projects = snap.docs.map(d => d.data());
+  } catch (err) {
+    console.error("Failed to load projects:", err);
+  }
+
+  if (!projects.length) {
+    body.innerHTML = `<tr><td colspan="4" class="bw-empty">No projects added yet — check back soon, or add some from the admin panel.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = projects.map(p => `
+    <tr>
+      <td class="bw-thumb-cell">
+        ${p.image
+          ? `<img class="bw-thumb" src="${p.image}" alt="${p.title || ''}">`
+          : `<div class="bw-thumb-placeholder">&#9679;</div>`}
+      </td>
+      <td>
+        <div class="bw-title">${p.link ? `<a href="${p.link}" target="_blank" rel="noopener">${p.title || "Untitled"}</a>` : (p.title || "Untitled")}</div>
+      </td>
+      <td class="col-desc"><div class="bw-desc">${p.description || ""}</div></td>
+      <td>${p.link ? `<a class="bw-link" href="${p.link}" target="_blank" rel="noopener">View →</a>` : ""}</td>
+    </tr>
+  `).join("");
 })();

@@ -3,27 +3,44 @@ import { getFirestore, collection, getDocs, query, orderBy } from "https://www.g
 
 const db = getFirestore(app);
 
+function formatDate(ts) {
+  if (!ts) return "";
+  return new Date(ts).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+function excerpt(text, len) {
+  if (!text) return "";
+  return text.length > len ? text.slice(0, len).trim() + "…" : text;
+}
+
 (async () => {
-  const list = document.getElementById("blogList");
-  const snap = await getDocs(query(collection(db, "blog_posts"), orderBy("createdAt", "desc")));
-  if (snap.empty) {
-    list.innerHTML = "<p>No posts yet — check back soon.</p>";
+  const body = document.getElementById("blogTableBody");
+  let posts = [];
+  try {
+    const snap = await getDocs(query(collection(db, "blog_posts"), orderBy("createdAt", "desc")));
+    posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (err) {
+    console.error("Failed to load posts:", err);
+  }
+
+  if (!posts.length) {
+    body.innerHTML = `<tr><td colspan="5" class="bw-empty">No posts yet — check back soon.</td></tr>`;
     return;
   }
-  list.innerHTML = "";
-  snap.forEach(d => {
-    const p = d.data();
-    const date = p.createdAt ? new Date(p.createdAt).toLocaleDateString() : "";
-    const card = document.createElement("a");
-    card.className = "card";
-    card.href = `blog-post.html?id=${d.id}`;
-    card.style.display = "block";
-    card.innerHTML = `
-      <h3>${p.title || "Untitled"}</h3>
-      ${date ? `<p style="color:var(--muted);font-size:0.85rem;">${date}</p>` : ""}
-      <p>${(p.content || "").slice(0, 200)}${(p.content || "").length > 200 ? "…" : ""}</p>
-      <p style="color:var(--accent);">Read more &rarr;</p>
-    `;
-    list.appendChild(card);
-  });
+
+  body.innerHTML = posts.map(p => `
+    <tr>
+      <td class="bw-thumb-cell">
+        ${p.image
+          ? `<img class="bw-thumb" src="${p.image}" alt="${p.title || ''}">`
+          : `<div class="bw-thumb-placeholder">&#9998;</div>`}
+      </td>
+      <td>
+        <div class="bw-title"><a href="blog-post.html?id=${p.id}">${p.title || "Untitled"}</a></div>
+      </td>
+      <td class="col-desc"><div class="bw-desc">${excerpt(p.content, 140)}</div></td>
+      <td class="col-date"><span class="bw-meta">${formatDate(p.createdAt)}</span></td>
+      <td><a class="bw-link" href="blog-post.html?id=${p.id}">Read →</a></td>
+    </tr>
+  `).join("");
 })();

@@ -26,9 +26,14 @@ async function loadPost() {
   const p = snap.data();
   document.getElementById("postTitle").textContent = p.title || "Untitled";
   document.getElementById("postContent").textContent = p.content || "";
-  if (p.createdAt) {
-    document.getElementById("postDate").textContent = new Date(p.createdAt).toLocaleDateString();
+  if (p.image) {
+    const imgEl = document.getElementById("postImage");
+    imgEl.src = p.image;
+    imgEl.alt = p.title || "";
+    imgEl.style.display = "block";
   }
+  const dateStr = p.createdAt ? new Date(p.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : "";
+  document.getElementById("postDate").textContent = `By Md. Rashedul Haque${dateStr ? ` · ${dateStr}` : ""}`;
 }
 
 async function loadComments() {

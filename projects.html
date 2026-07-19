@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="portfolio.css"/>
 <link rel="stylesheet" href="css/mainnav.css"/>
+<link rel="stylesheet" href="css/monochrome.css"/>
 </head>
 <body>
   <nav class="mainnav" id="mainnav">
@@ -25,21 +26,38 @@
       <a href="index.html#experience" data-target="experience" data-anchor="true">Experience</a>
       <a href="index.html#services" data-target="services" data-anchor="true">Services</a>
       <a href="index.html#portfolio" data-target="portfolio" data-anchor="true">Portfolio</a>
+      <a href="index.html#contact" data-target="contact" data-anchor="true">Contact</a>
+      <span class="mainnav-divider"></span>
       <a href="projects.html" data-target="projects" data-page="projects.html">Projects</a>
       <a href="resume.html" data-target="resume" data-page="resume.html">Resume</a>
       <a href="blog.html" data-target="blog" data-page="blog.html">Blog</a>
-      <a href="index.html#contact" data-target="contact" data-anchor="true">Contact</a>
+      <span class="mainnav-divider"></span>
       <a href="admin-login.html" data-target="admin-login.html" data-page="admin-login.html">Admin</a>
+      <span class="mainnav-divider"></span>
       <span id="authNav" class="mainnav-auth"><a href="login.html">Login</a></span>
     </div>
   </div>
 </nav>
-<section class="page-section">
-  <h1>Projects</h1>
-  <p>HR analytics dashboards, HRMS automation, and process improvement work.</p>
-</section>
-<div class="card-grid" id="projectGrid">
-  <div class="card"><h3>Coming soon</h3><p>Projects added from the admin panel will appear here.</p></div>
+<div class="bw-theme">
+  <header class="bw-header">
+    <h1>Projects</h1>
+    <p>HR analytics dashboards, HRMS automation, and process improvement work.</p>
+  </header>
+  <div class="bw-table-wrap">
+    <table class="bw-table" id="projectTable">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Title</th>
+          <th class="col-desc">Description</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="projectTableBody">
+        <tr><td colspan="4" class="bw-empty">Loading projects…</td></tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 <footer class="site-footer"><p>&copy; 2026 Md. Rashedul Haque.</p></footer>
 <script type="module" src="js/auth-nav.js"></script>

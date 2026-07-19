@@ -13,6 +13,7 @@ const DEFAULT_ABOUT = {
   email: "rhaque.eee@gmail.com",
   availability: "Open to opportunities",
   typedRoles: "HR Business Partner, People Strategy Leader, HR Analytics Specialist, Payroll & Compliance Expert",
+  socialLinkedin: "https://www.linkedin.com/in/rashedulhaque",
   bio: "I am a passionate Human Resources professional with a strong background in HR operations, data analytics, and strategic business partnering. Currently serving as a Strategic Partner at Youngone Hi-Tech (Dhaka EPZ), I focus on aligning people strategies with organizational goals, driving employee engagement, and supporting leadership in building a high-performing culture."
 };
 
@@ -61,6 +62,21 @@ const DEFAULT_EXPERIENCE = [
     const roles = about.typedRoles.split(",").map(s => s.trim()).filter(Boolean);
     if (roles.length) window.initTyped(roles);
   }
+
+  const socialMap = {
+    socialTwitter: about.socialTwitter,
+    socialFacebook: about.socialFacebook,
+    socialLinkedin: about.socialLinkedin,
+    socialInstagram: about.socialInstagram,
+    socialGithub: about.socialGithub
+  };
+  Object.entries(socialMap).forEach(([id, url]) => {
+    const linkEl = document.getElementById(id);
+    if (linkEl && url) {
+      linkEl.href = url;
+      linkEl.classList.remove("d-none");
+    }
+  });
 })();
 
 /* ── Skills ──────────────────────────────────────────────── */
