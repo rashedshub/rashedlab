@@ -714,6 +714,64 @@ form button:hover { background: var(--ink-2); }
 .resume-header .contact-line { color: var(--muted); font-size: 0.92rem; }
 .resume-header .contact-line a { color: var(--brass); }
 
+.resume-download-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 18px;
+  padding: 10px 22px;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.resume-download-btn:hover { background: var(--brass); }
+
+/* ============================================================
+   Print stylesheet — used when the visitor clicks
+   "Download Resume (PDF)" (triggers window.print()).
+   Formats resume.html as a clean, single-column CV
+   suitable for saving as a PDF from the browser's print dialog.
+   ============================================================ */
+@media print {
+  @page { margin: 14mm 16mm; }
+
+  body { padding-top: 0 !important; background: #fff !important; }
+
+  .mainnav,
+  .site-footer,
+  .resume-download-btn,
+  #authNav { display: none !important; }
+
+  .resume-wrap { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+
+  .resume-header { border-bottom: 1.5px solid #000 !important; padding-bottom: 14px !important; margin-bottom: 14px !important; }
+  .resume-header h1 { color: #000 !important; font-size: 1.5rem !important; }
+  .resume-header .contact-line { color: #333 !important; font-size: 0.82rem !important; }
+  .resume-header .contact-line a { color: #000 !important; text-decoration: underline; }
+  .resume-download-btn { display: none !important; }
+
+  .resume-wrap h2 { color: #000 !important; font-size: 1rem !important; margin-top: 20px !important; margin-bottom: 12px !important; }
+  .resume-wrap h2::after { background: #999 !important; }
+
+  .timeline::before { background: #ccc !important; }
+  .entry { break-inside: avoid; margin-bottom: 14px !important; }
+  .entry::before { border-color: #000 !important; background: #fff !important; }
+  .entry .role { color: #000 !important; font-size: 0.92rem !important; }
+  .entry .meta { color: #444 !important; font-style: normal !important; font-size: 0.78rem !important; }
+  .entry ul, .entry p { color: #222 !important; font-size: 0.82rem !important; }
+  .entry li { margin-bottom: 2px !important; }
+
+  .skill-tag { border: 1px solid #999 !important; background: #fff !important; color: #000 !important; }
+
+  a { text-decoration: none; color: inherit; }
+}
+
 .resume-wrap h2 {
   margin-top: 48px; margin-bottom: 26px; font-size: 1.3rem; color: var(--ink);
   display: flex; align-items: center; gap: 12px;
