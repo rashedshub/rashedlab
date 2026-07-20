@@ -40,9 +40,10 @@
 
   <section class="resume-wrap">
     <div class="resume-header">
-      <h1>Md. Rashedul Haque</h1>
-      <p class="contact-line">Dhaka, Bangladesh &nbsp;&middot;&nbsp; rhaque.eee@gmail.com &nbsp;&middot;&nbsp;
-        <a href="https://www.linkedin.com/in/rashedulhaque" target="_blank" rel="noopener">LinkedIn</a></p>
+      <h1 id="rName">Md. Rashedul Haque</h1>
+      <p class="resume-headline" id="rHeadline">Human Resource Business Partner</p>
+      <p class="contact-line" id="rContactLine">Savar, Dhaka &middot; mail.rashedulhaque@gmail.com &middot; (+880) 1622 702 800</p>
+      <p class="contact-line" id="rContactLine2"></p>
       <button id="downloadResumeBtn" class="resume-download-btn">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:7px;vertical-align:-2px;">
           <path d="M8 1v9m0 0L4.5 6.5M8 10l3.5-3.5M2 12.5v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -51,36 +52,41 @@
       </button>
     </div>
 
+    <h2>Summary</h2>
+    <p id="rSummary" class="resume-summary"></p>
 
     <h2>Experience</h2>
-    <div class="timeline" id="resumeExperience">
-      <!-- populated by js/resume.js from Firestore; falls back to defaults if empty -->
-    </div>
+    <div id="resumeExperience"><!-- js/resume.js --></div>
+
+    <h2>Key Achievements</h2>
+    <div class="achv-grid" id="resumeAchievements"><!-- js/resume.js --></div>
+
+    <h2>Skills</h2>
+    <div class="skills-groups" id="resumeSkillGroups"><!-- js/resume.js --></div>
+
+    <h2>Projects</h2>
+    <div class="timeline" id="resumeProjects"><!-- js/resume.js --></div>
 
     <h2>Education</h2>
-    <div class="timeline">
-    <div class="entry">
-      <div class="role">MBA, Human Resources Management — Jahangirnagar University</div>
-      <div class="meta">2015 – 2017</div>
-    </div>
-    <div class="entry">
-      <div class="role">BS, Electrical and Electronic Engineering — University of Asia Pacific</div>
-      <div class="meta">2009 – 2013</div>
-    </div>
-    </div>
+    <div class="timeline" id="resumeEducation"><!-- js/resume.js --></div>
 
-    <h2>Top Skills</h2>
-    <div>
-      <span class="skill-tag">HR Business Partnering</span>
-      <span class="skill-tag">Employee Relations & Engagement</span>
-      <span class="skill-tag">HR Analytics & Reporting</span>
-    </div>
-
-    <h2>Languages</h2>
-    <p>English (Full Professional) &middot; Bangla (Native or Bilingual)</p>
+    <h2>Training / Short Courses</h2>
+    <div class="timeline" id="resumeTraining"><!-- js/resume.js --></div>
 
     <h2>Certifications</h2>
-    <p>IEB Membership</p>
+    <div class="timeline" id="resumeCerts"><!-- js/resume.js --></div>
+
+    <h2>Interests</h2>
+    <div class="interest-grid" id="resumeInterests"><!-- js/resume.js --></div>
+
+    <h2>Languages</h2>
+    <p id="rLanguages">English &middot; Bangla</p>
+
+    <h2>Volunteering</h2>
+    <div id="resumeVolunteering"><!-- js/resume.js --></div>
+
+    <h2>References</h2>
+    <p id="rReferences">Available upon request.</p>
   </section>
 
   <footer class="site-footer"><p>&copy; 2026 Md. Rashedul Haque.</p></footer>

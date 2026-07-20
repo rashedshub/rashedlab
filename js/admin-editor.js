@@ -26,6 +26,12 @@ onAuthStateChanged(auth, async (user) => {
   loadAbout();
   loadSkills();
   loadExperience();
+  loadResumeInfo();
+  loadEducation();
+  loadAchievements();
+  loadResumeProjects();
+  loadTraining();
+  loadCertifications();
   loadProjects();
   loadPosts();
   loadMessages();
@@ -228,15 +234,33 @@ el("saveSkill").addEventListener("click", async () => {
   }
 });
 
-// ── Experience ──────────────────────────────────────────────
+// ── Experience (with sub-roles) ────────────────────────────
+function parseSubroles(raw) {
+  const blocks = raw.split(/\n(?=##\s)/).map(b => b.trim()).filter(Boolean);
+  return blocks.map(block => {
+    const lines = block.split("\n").map(l => l.trim()).filter(Boolean);
+    const title = (lines[0] || "").replace(/^##\s*/, "").trim();
+    const bullets = lines.slice(1)
+      .filter(l => l.startsWith("-"))
+      .map(l => l.replace(/^-\s*/, "").trim())
+      .filter(Boolean);
+    return { title, bullets };
+  }).filter(sr => sr.title);
+}
+
+function serializeSubroles(subroles) {
+  return (subroles || []).map(sr =>
+    `## ${sr.title}\n${(sr.bullets || []).map(b => `- ${b}`).join("\n")}`
+  ).join("\n\n");
+}
+
 function clearExpForm() {
   el("expId").value = "";
   el("expRole").value = "";
   el("expCompany").value = "";
   el("expYears").value = "";
   el("expOrder").value = "";
-  el("expDescription").value = "";
-  el("expBullets").value = "";
+  el("expSubroles").value = "";
 }
 el("clearExpForm").addEventListener("click", clearExpForm);
 
@@ -250,6 +274,7 @@ async function loadExperience() {
     row.className = "item-row";
     row.innerHTML = `<strong>${e.role || ""}</strong>
       <p>${e.company || ""} ${e.years ? `· ${e.years}` : ""}</p>
+      <p style="font-size:0.8rem;">${(e.subroles || []).map(sr => sr.title).join(" · ")}</p>
       <div>
         <button data-edit="${d.id}">Edit</button>
         <button data-delete="${d.id}">Delete</button>
@@ -264,8 +289,7 @@ async function loadExperience() {
     el("expCompany").value = e.company || "";
     el("expYears").value = e.years || "";
     el("expOrder").value = e.order ?? "";
-    el("expDescription").value = e.description || "";
-    el("expBullets").value = (e.bullets || []).join("\n");
+    el("expSubroles").value = serializeSubroles(e.subroles);
   }));
   list.querySelectorAll("[data-delete]").forEach(b => b.addEventListener("click", async () => {
     if (!confirm("Delete this experience entry?")) return;
@@ -280,8 +304,7 @@ el("saveExp").addEventListener("click", async () => {
     company: el("expCompany").value,
     years: el("expYears").value,
     order: Number(el("expOrder").value) || 0,
-    description: el("expDescription").value,
-    bullets: el("expBullets").value.split("\n").map(l => l.trim()).filter(Boolean)
+    subroles: parseSubroles(el("expSubroles").value)
   };
   const id = el("expId").value;
   el("expMsg").style.color = "";
@@ -513,3 +536,228 @@ el("saveService").addEventListener("click", async () => {
 });
 
 
+
+// ── Resume Info (single doc: site_content/resume) ──────────
+async function loadResumeInfo() {
+  const snap = await getDoc(doc(db, "site_content", "resume"));
+  if (!snap.exists()) return;
+  const d = snap.data();
+  el("rfName").value = d.name || "";
+  el("rfHeadline").value = d.headline || "";
+  el("rfLocation").value = d.location || "";
+  el("rfEmail").value = d.email || "";
+  el("rfPhone").value = d.phone || "";
+  el("rfWebsite").value = d.website || "";
+  el("rfBirthday").value = d.birthday || "";
+  el("rfSummary").value = d.summary || "";
+  el("rfSkillsHR").value = d.skillsHR || "";
+  el("rfSkillsTechnical").value = d.skillsTechnical || "";
+  el("rfSkillsLeadership").value = d.skillsLeadership || "";
+  el("rfInterests").value = d.interests || "";
+  el("rfLanguages").value = d.languages || "";
+  el("rfVolTitle").value = d.volunteeringTitle || "";
+  el("rfVolDesc").value = d.volunteeringDesc || "";
+  el("rfReferences").value = d.references || "";
+}
+
+el("saveResumeInfo").addEventListener("click", async () => {
+  const data = {
+    name: el("rfName").value,
+    headline: el("rfHeadline").value,
+    location: el("rfLocation").value,
+    email: el("rfEmail").value,
+    phone: el("rfPhone").value,
+    website: el("rfWebsite").value,
+    birthday: el("rfBirthday").value,
+    summary: el("rfSummary").value,
+    skillsHR: el("rfSkillsHR").value,
+    skillsTechnical: el("rfSkillsTechnical").value,
+    skillsLeadership: el("rfSkillsLeadership").value,
+    interests: el("rfInterests").value,
+    languages: el("rfLanguages").value,
+    volunteeringTitle: el("rfVolTitle").value,
+    volunteeringDesc: el("rfVolDesc").value,
+    references: el("rfReferences").value
+  };
+  el("resumeInfoMsg").style.color = "";
+  el("resumeInfoMsg").textContent = "Saving…";
+  try {
+    await setDoc(doc(db, "site_content", "resume"), data, { merge: true });
+    el("resumeInfoMsg").textContent = "Saved.";
+    setTimeout(() => el("resumeInfoMsg").textContent = "", 2500);
+  } catch (err) {
+    console.error("Failed to save resume info:", err);
+    el("resumeInfoMsg").style.color = "#ff8080";
+    el("resumeInfoMsg").textContent = `Save failed: ${err.message}`;
+  }
+});
+
+// ── Generic list-CRUD factory (used for Education, Achievements,
+//    Resume Projects, Training, Certifications) ────────────────
+function makeListCrud({ collectionName, fields, formIdPrefix, listElId, msgElId, saveBtnId, clearBtnId, renderRow, orderField = "order" }) {
+  const idEl = () => el(`${formIdPrefix}Id`);
+
+  function clearForm() {
+    idEl().value = "";
+    fields.forEach(f => { const e = el(f.id); if (e) e.value = ""; });
+  }
+  el(clearBtnId).addEventListener("click", clearForm);
+
+  function readForm() {
+    const data = {};
+    fields.forEach(f => {
+      const raw = el(f.id).value;
+      data[f.key] = f.type === "number" ? (Number(raw) || 0)
+        : f.type === "lines" ? raw.split("\n").map(l => l.trim()).filter(Boolean)
+        : raw;
+    });
+    return data;
+  }
+
+  function fillForm(data) {
+    fields.forEach(f => {
+      const e = el(f.id);
+      if (!e) return;
+      const val = data[f.key];
+      e.value = f.type === "lines" ? (val || []).join("\n") : (val ?? "");
+    });
+  }
+
+  async function load() {
+    const snap = await getDocs(query(collection(db, collectionName), orderBy(orderField, "asc")));
+    const list = el(listElId);
+    list.innerHTML = "";
+    snap.forEach(d => {
+      const data = d.data();
+      const row = document.createElement("div");
+      row.className = "item-row";
+      row.innerHTML = renderRow(data) + `
+        <div>
+          <button data-edit="${d.id}">Edit</button>
+          <button data-delete="${d.id}">Delete</button>
+        </div>`;
+      list.appendChild(row);
+    });
+    list.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", async () => {
+      const s = await getDoc(doc(db, collectionName, b.dataset.edit));
+      idEl().value = b.dataset.edit;
+      fillForm(s.data());
+    }));
+    list.querySelectorAll("[data-delete]").forEach(b => b.addEventListener("click", async () => {
+      if (!confirm("Delete this entry?")) return;
+      await deleteDoc(doc(db, collectionName, b.dataset.delete));
+      load();
+    }));
+  }
+
+  el(saveBtnId).addEventListener("click", async () => {
+    const data = readForm();
+    const id = idEl().value;
+    const msg = el(msgElId);
+    msg.style.color = "";
+    msg.textContent = "Saving…";
+    try {
+      if (id) {
+        await updateDoc(doc(db, collectionName, id), data);
+      } else {
+        await addDoc(collection(db, collectionName), data);
+      }
+      msg.textContent = "Saved.";
+      setTimeout(() => msg.textContent = "", 2500);
+      clearForm();
+      load();
+    } catch (err) {
+      console.error(`Failed to save ${collectionName}:`, err);
+      msg.style.color = "#ff8080";
+      msg.textContent = `Save failed: ${err.message}`;
+    }
+  });
+
+  return load;
+}
+
+// Education
+const loadEducation = makeListCrud({
+  collectionName: "education",
+  formIdPrefix: "edu",
+  listElId: "eduList",
+  msgElId: "eduMsg",
+  saveBtnId: "saveEdu",
+  clearBtnId: "clearEduForm",
+  fields: [
+    { id: "eduDegree", key: "degree" },
+    { id: "eduSchool", key: "school" },
+    { id: "eduYears", key: "years" },
+    { id: "eduOrder", key: "order", type: "number" }
+  ],
+  renderRow: d => `<strong>${d.degree || ""}</strong><p>${d.school || ""} ${d.years ? `· ${d.years}` : ""}</p>`
+});
+
+// Achievements
+const loadAchievements = makeListCrud({
+  collectionName: "achievements",
+  formIdPrefix: "achv",
+  listElId: "achvList",
+  msgElId: "achvMsg",
+  saveBtnId: "saveAchv",
+  clearBtnId: "clearAchvForm",
+  fields: [
+    { id: "achvTitle", key: "title" },
+    { id: "achvDescription", key: "description" },
+    { id: "achvOrder", key: "order", type: "number" }
+  ],
+  renderRow: d => `<strong>${d.title || ""}</strong><p>${d.description || ""}</p>`
+});
+
+// Resume Projects (separate from the Portfolio "projects" collection)
+const loadResumeProjects = makeListCrud({
+  collectionName: "resume_projects",
+  formIdPrefix: "rp",
+  listElId: "rpList",
+  msgElId: "rpMsg",
+  saveBtnId: "saveRP",
+  clearBtnId: "clearRPForm",
+  fields: [
+    { id: "rpTitle", key: "title" },
+    { id: "rpYears", key: "years" },
+    { id: "rpBullets", key: "bullets", type: "lines" },
+    { id: "rpOrder", key: "order", type: "number" }
+  ],
+  renderRow: d => `<strong>${d.title || ""}</strong><p>${d.years || ""}</p>`
+});
+
+// Training / Short Courses
+const loadTraining = makeListCrud({
+  collectionName: "training",
+  formIdPrefix: "train",
+  listElId: "trainList",
+  msgElId: "trainMsg",
+  saveBtnId: "saveTrain",
+  clearBtnId: "clearTrainForm",
+  fields: [
+    { id: "trainTitle", key: "title" },
+    { id: "trainProvider", key: "provider" },
+    { id: "trainYears", key: "years" },
+    { id: "trainLink", key: "link" },
+    { id: "trainOrder", key: "order", type: "number" }
+  ],
+  renderRow: d => `<strong>${d.title || ""}</strong><p>${d.provider || ""} ${d.years ? `· ${d.years}` : ""}</p>`
+});
+
+// Certifications
+const loadCertifications = makeListCrud({
+  collectionName: "certifications",
+  formIdPrefix: "cert",
+  listElId: "certList",
+  msgElId: "certMsg",
+  saveBtnId: "saveCert",
+  clearBtnId: "clearCertForm",
+  fields: [
+    { id: "certTitle", key: "title" },
+    { id: "certOrg", key: "org" },
+    { id: "certDate", key: "date" },
+    { id: "certDescription", key: "description" },
+    { id: "certOrder", key: "order", type: "number" }
+  ],
+  renderRow: d => `<strong>${d.title || ""}</strong><p>${d.org || ""} ${d.date ? `· ${d.date}` : ""}</p>`
+});

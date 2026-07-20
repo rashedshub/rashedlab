@@ -123,6 +123,8 @@
     <button data-panel="about" class="active">About Me</button>
     <button data-panel="skills">Skills</button>
     <button data-panel="experience">Experience</button>
+    <button data-panel="resumeinfo">Resume Info</button>
+    <button data-panel="resumesections">Resume Sections</button>
     <button data-panel="services">Services</button>
     <button data-panel="projects">Projects</button>
     <button data-panel="blog">Blog</button>
@@ -237,29 +239,33 @@
   <div class="panel" id="panel-experience">
     <div class="panel-card">
       <h3>Add / Edit Experience</h3>
+      <p style="color:rgba(242,242,242,0.55);font-size:0.85rem;">One entry per employer/role. Add "hats" (sub-roles) held within it below — e.g. HR Business Partner, Data Analyst, Payroll Manager — each with its own bullets.</p>
       <input type="hidden" id="expId"/>
       <div class="field-grid">
         <div>
-          <label>Role / Title</label>
-          <input type="text" class="form-control" id="expRole"/>
-        </div>
-        <div>
           <label>Company</label>
-          <input type="text" class="form-control" id="expCompany"/>
+          <input type="text" class="form-control" id="expCompany" placeholder="Youngone Corporation — Youngone Hi-Tech..."/>
         </div>
         <div>
-          <label>Years (e.g. "Jun 2024 – Present")</label>
-          <input type="text" class="form-control" id="expYears"/>
+          <label>Role / Title</label>
+          <input type="text" class="form-control" id="expRole" placeholder="Deputy Manager, Human Resource"/>
+        </div>
+        <div>
+          <label>Years</label>
+          <input type="text" class="form-control" id="expYears" placeholder="October 2016 – Present"/>
         </div>
         <div>
           <label>Order (lower shows first)</label>
           <input type="number" class="form-control" id="expOrder"/>
         </div>
       </div>
-      <label>Short Description (used on Home page)</label>
-      <textarea class="form-control" id="expDescription" rows="3"></textarea>
-      <label>Detail Bullets — one per line (used on Resume page)</label>
-      <textarea class="form-control" id="expBullets" rows="5"></textarea>
+      <label>Sub-roles &amp; Bullets — format each sub-role as a "## Title" line, followed by bullet lines starting with "- "</label>
+      <textarea class="form-control" id="expSubroles" rows="12" placeholder="## HR Business Partner
+- Supported change management initiatives...
+- Led performance management cycles...
+
+## Data Analyst
+- Led 10+ HR analytics projects using Power BI..."></textarea>
       <button class="btn-save" id="saveExp">Save Experience</button>
       <button class="btn-clear" id="clearExpForm" type="button">Clear / New</button>
       <p class="save-msg" id="expMsg"></p>
@@ -312,6 +318,144 @@
   <div class="panel" id="panel-messages">
     <h3 style="color:#fff;">Contact Messages</h3>
     <div id="messageList"></div>
+  </div>
+
+  <!-- RESUME INFO -->
+  <div class="panel" id="panel-resumeinfo">
+    <p style="color:rgba(242,242,242,0.6);">These fields power the Resume page header, Summary, Skills groups, Interests, Languages, Volunteering, and References. Separate from the Home page's About Me.</p>
+    <div class="panel-card">
+      <h3>Header</h3>
+      <div class="field-grid">
+        <div><label>Name</label><input type="text" class="form-control" id="rfName"/></div>
+        <div><label>Headline</label><input type="text" class="form-control" id="rfHeadline" placeholder="Human Resource Business Partner"/></div>
+        <div><label>Location</label><input type="text" class="form-control" id="rfLocation"/></div>
+        <div><label>Email</label><input type="email" class="form-control" id="rfEmail"/></div>
+        <div><label>Phone</label><input type="text" class="form-control" id="rfPhone"/></div>
+        <div><label>Website / Portfolio Link</label><input type="text" class="form-control" id="rfWebsite"/></div>
+        <div style="grid-column:1/-1;"><label>Birthday (optional)</label><input type="text" class="form-control" id="rfBirthday" placeholder="07 May 1989 (Age 37)"/></div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <h3>Summary</h3>
+      <textarea class="form-control" id="rfSummary" rows="6"></textarea>
+    </div>
+    <div class="panel-card">
+      <h3>Skills (comma-separated within each category)</h3>
+      <label>HR & Business Skills</label>
+      <textarea class="form-control" id="rfSkillsHR" rows="2"></textarea>
+      <label>Technical Skills</label>
+      <textarea class="form-control" id="rfSkillsTechnical" rows="2"></textarea>
+      <label>Leadership Skills</label>
+      <textarea class="form-control" id="rfSkillsLeadership" rows="2"></textarea>
+    </div>
+    <div class="panel-card">
+      <h3>Interests</h3>
+      <label>One per line, format: Title | short description (description optional)</label>
+      <textarea class="form-control" id="rfInterests" rows="5" placeholder="Artificial Intelligence | OpenAI, ChatGPT, Deepseek"></textarea>
+    </div>
+    <div class="panel-card">
+      <h3>Languages</h3>
+      <input type="text" class="form-control" id="rfLanguages" placeholder="English · Bangla"/>
+    </div>
+    <div class="panel-card">
+      <h3>Volunteering</h3>
+      <label>Title</label>
+      <input type="text" class="form-control" id="rfVolTitle" placeholder="Blood Donor"/>
+      <label>Description</label>
+      <textarea class="form-control" id="rfVolDesc" rows="2"></textarea>
+    </div>
+    <div class="panel-card">
+      <h3>References</h3>
+      <input type="text" class="form-control" id="rfReferences" placeholder="Available upon request."/>
+    </div>
+    <button class="btn-save" id="saveResumeInfo">Save Resume Info</button>
+    <p class="save-msg" id="resumeInfoMsg"></p>
+  </div>
+
+  <!-- RESUME SECTIONS -->
+  <div class="panel" id="panel-resumesections">
+
+    <div class="panel-card">
+      <h3>Education</h3>
+      <input type="hidden" id="eduId"/>
+      <div class="field-grid">
+        <div><label>Degree</label><input type="text" class="form-control" id="eduDegree"/></div>
+        <div><label>School</label><input type="text" class="form-control" id="eduSchool"/></div>
+        <div><label>Years</label><input type="text" class="form-control" id="eduYears"/></div>
+        <div><label>Order</label><input type="number" class="form-control" id="eduOrder"/></div>
+      </div>
+      <button class="btn-save" id="saveEdu">Save Education</button>
+      <button class="btn-clear" id="clearEduForm" type="button">Clear / New</button>
+      <p class="save-msg" id="eduMsg"></p>
+      <div id="eduList" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="panel-card">
+      <h3>Key Achievements</h3>
+      <input type="hidden" id="achvId"/>
+      <label>Title</label>
+      <input type="text" class="form-control" id="achvTitle"/>
+      <label>Description</label>
+      <textarea class="form-control" id="achvDescription" rows="2"></textarea>
+      <label>Order</label>
+      <input type="number" class="form-control" id="achvOrder" style="max-width:120px;"/>
+      <button class="btn-save" id="saveAchv">Save Achievement</button>
+      <button class="btn-clear" id="clearAchvForm" type="button">Clear / New</button>
+      <p class="save-msg" id="achvMsg"></p>
+      <div id="achvList" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="panel-card">
+      <h3>Resume Projects <span style="color:rgba(242,242,242,0.5);font-weight:400;font-size:0.8rem;">(separate from the Portfolio "Projects" tab)</span></h3>
+      <input type="hidden" id="rpId"/>
+      <div class="field-grid">
+        <div><label>Title</label><input type="text" class="form-control" id="rpTitle"/></div>
+        <div><label>Years</label><input type="text" class="form-control" id="rpYears"/></div>
+      </div>
+      <label>Bullets — one per line</label>
+      <textarea class="form-control" id="rpBullets" rows="4"></textarea>
+      <label>Order</label>
+      <input type="number" class="form-control" id="rpOrder" style="max-width:120px;"/>
+      <button class="btn-save" id="saveRP">Save Project</button>
+      <button class="btn-clear" id="clearRPForm" type="button">Clear / New</button>
+      <p class="save-msg" id="rpMsg"></p>
+      <div id="rpList" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="panel-card">
+      <h3>Training / Short Courses</h3>
+      <input type="hidden" id="trainId"/>
+      <div class="field-grid">
+        <div><label>Title</label><input type="text" class="form-control" id="trainTitle"/></div>
+        <div><label>Provider</label><input type="text" class="form-control" id="trainProvider"/></div>
+        <div><label>Years / Date</label><input type="text" class="form-control" id="trainYears"/></div>
+        <div><label>Certificate Link (optional)</label><input type="text" class="form-control" id="trainLink"/></div>
+      </div>
+      <label>Order</label>
+      <input type="number" class="form-control" id="trainOrder" style="max-width:120px;"/>
+      <button class="btn-save" id="saveTrain">Save Training</button>
+      <button class="btn-clear" id="clearTrainForm" type="button">Clear / New</button>
+      <p class="save-msg" id="trainMsg"></p>
+      <div id="trainList" style="margin-top:14px;"></div>
+    </div>
+
+    <div class="panel-card">
+      <h3>Certifications</h3>
+      <input type="hidden" id="certId"/>
+      <div class="field-grid">
+        <div><label>Title</label><input type="text" class="form-control" id="certTitle"/></div>
+        <div><label>Organization</label><input type="text" class="form-control" id="certOrg"/></div>
+        <div><label>Date</label><input type="text" class="form-control" id="certDate"/></div>
+        <div><label>Order</label><input type="number" class="form-control" id="certOrder"/></div>
+      </div>
+      <label>Description</label>
+      <textarea class="form-control" id="certDescription" rows="3"></textarea>
+      <button class="btn-save" id="saveCert">Save Certification</button>
+      <button class="btn-clear" id="clearCertForm" type="button">Clear / New</button>
+      <p class="save-msg" id="certMsg"></p>
+      <div id="certList" style="margin-top:14px;"></div>
+    </div>
+
   </div>
 
   <!-- SERVICES -->

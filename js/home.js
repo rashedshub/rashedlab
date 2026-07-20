@@ -27,12 +27,12 @@ const DEFAULT_SKILLS = [
 ];
 
 const DEFAULT_EXPERIENCE = [
-  { role: "Strategic Business Partner", company: "Youngone Corporation", years: "Sep 2025 – Present", description: "HR Business Partner for Youngone Hi-Tech Sportswear Industries Ltd. (DEPZ) — driving employee engagement, organizational development, and strategic HR alignment with business goals." },
-  { role: "Deputy Manager, Human Resources", company: "Youngone Corporation", years: "Jun 2024 – Present", description: "Led HR analytics, payroll, and digital transformation projects. Designed Power BI dashboards for HR KPIs and managed payroll for 8,000+ employees with 100% compliance." },
-  { role: "Assistant Manager, Human Resources", company: "Youngone Corporation", years: "Mar 2021 – Jun 2024", description: "Delivered real-time HR dashboards and turnover reports. Co-led HRMS rollout and oversaw payroll, appraisal, and increment cycles for 6,000+ employees." },
-  { role: "Senior HR Officer", company: "Youngone Corporation", years: "Nov 2019 – Mar 2021", description: "Supported HRMS deployment, payroll, reconciliations, and performance evaluation processes." },
-  { role: "HR Officer", company: "Youngone Corporation", years: "Nov 2018 – Oct 2019", description: "Designed training programs, oversaw recruitment & selection, and managed compliance reporting." },
-  { role: "Assistant HR Officer", company: "Youngone Corporation", years: "Oct 2016 – Nov 2018", description: "Conducted training needs analysis and supported Health & Safety and compliance training programs." }
+  { role: "Deputy Manager, Human Resource", company: "Youngone Corporation", years: "October 2016 – Present",
+    subroles: [
+      { title: "HR Business Partner" }, { title: "Data Analyst" }, { title: "Payroll Manager" },
+      { title: "L&D Specialist" }, { title: "HR Policy & Process Analyst" },
+      { title: "Risk & Compliance Coordinator" }, { title: "Team Lead" }
+    ] }
 ];
 
 /* ── About Me ────────────────────────────────────────────── */
@@ -123,7 +123,7 @@ const DEFAULT_EXPERIENCE = [
       <span class="bi bi-arrow-right fs-4 text-light position-absolute" style="top: -5px; left: -50px;"></span>
       <h5 class="mb-1">${e.role || ""}</h5>
       <p class="mb-2">${e.company || ""} ${e.years ? `| <small>${e.years}</small>` : ""}</p>
-      <p>${e.description || ""}</p>
+      ${(e.subroles && e.subroles.length) ? `<p>${e.subroles.map(sr => sr.title).filter(Boolean).join(" · ")}</p>` : (e.description ? `<p>${e.description}</p>` : "")}
     </div>
   `).join("");
 })();
