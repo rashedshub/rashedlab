@@ -721,7 +721,9 @@ form button:hover { background: var(--ink-2); }
 .exp-block { margin-bottom: 30px; }
 .exp-block .exp-company { font-weight: 700; color: var(--ink); font-size: 1.05rem; }
 .exp-block .exp-role { color: var(--brass); font-weight: 600; font-size: 0.95rem; }
-.exp-block .exp-years { color: var(--muted); font-size: 0.85rem; font-style: italic; margin-bottom: 14px; }
+.exp-block .exp-years { color: var(--muted); font-size: 0.85rem; font-style: italic; margin-bottom: 8px; }
+.exp-block .exp-tagline { color: var(--muted); font-size: 0.88rem; font-style: italic; margin: 6px 0; }
+.exp-block .exp-role-category { font-weight: 700; color: var(--ink); font-size: 0.9rem; text-decoration: underline; margin: 10px 0 4px; }
 
 .subrole {
   border-left: 2px solid var(--border);
@@ -809,6 +811,8 @@ form button:hover { background: var(--ink-2); }
   .exp-block { break-inside: avoid; margin-bottom: 16px !important; }
   .exp-block .exp-company, .exp-block .exp-role { color: #000 !important; }
   .exp-block .exp-years { color: #444 !important; }
+  .exp-block .exp-tagline { color: #444 !important; font-size: 0.78rem !important; }
+  .exp-block .exp-role-category { color: #000 !important; font-size: 0.82rem !important; }
   .subrole { border-color: #999 !important; break-inside: avoid; }
   .subrole .subrole-title { color: #000 !important; }
   .subrole li { color: #222 !important; font-size: 0.8rem !important; }

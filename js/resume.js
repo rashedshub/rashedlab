@@ -25,9 +25,12 @@ const DEFAULT_HEADER = {
 };
 
 const DEFAULT_EXPERIENCE = [{
-  company: "Youngone Corporation — Youngone Hi-Tech Sportswear Industries Ltd. (DEPZ), Savar, Dhaka",
-  role: "Deputy Manager, Human Resource",
-  years: "October 2016 – Present",
+  company: "Youngone Corporation | Factory: Youngone Hi-Tech Sportswear Industries Ltd. — DEPZ (Old), Savar, Dhaka",
+  companyLink: "https://youngonecorporation.com/",
+  role: "Deputy Manager Human Resource",
+  years: "Oct 2016 – Present",
+  tagline: "Leading company in sportswear manufacturing",
+  roleCategory: "Diverse HR Responsibilities",
   order: 1,
   subroles: [
     { title: "HR Business Partner", bullets: [
@@ -160,9 +163,11 @@ const DEFAULT_CERTS = [
 
   container.innerHTML = experience.map(e => `
     <div class="exp-block">
-      <div class="exp-company">${e.company || ""}</div>
+      <div class="exp-company">${e.companyLink ? `<a href="${e.companyLink}" target="_blank" rel="noopener">${e.company || ""}</a>` : (e.company || "")}</div>
       <div class="exp-role">${e.role || ""}</div>
       <div class="exp-years">${e.years || ""}</div>
+      ${e.tagline ? `<p class="exp-tagline">${e.tagline}</p>` : ""}
+      ${e.roleCategory ? `<div class="exp-role-category">${e.roleCategory}</div>` : ""}
       ${(e.subroles || []).map(sr => `
         <div class="subrole">
           <div class="subrole-title">${sr.title || ""}</div>

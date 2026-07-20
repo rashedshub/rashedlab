@@ -235,34 +235,42 @@ el("saveSkill").addEventListener("click", async () => {
 });
 
 // ── Experience (with sub-roles) ────────────────────────────
-function parseSubroles(raw) {
-  const blocks = raw.split(/\n(?=##\s)/).map(b => b.trim()).filter(Boolean);
-  return blocks.map(block => {
-    const lines = block.split("\n").map(l => l.trim()).filter(Boolean);
-    const title = (lines[0] || "").replace(/^##\s*/, "").trim();
-    const bullets = lines.slice(1)
-      .filter(l => l.startsWith("-"))
-      .map(l => l.replace(/^-\s*/, "").trim())
-      .filter(Boolean);
-    return { title, bullets };
-  }).filter(sr => sr.title);
+function addSubroleBlock(title = "", bullets = []) {
+  const wrap = document.createElement("div");
+  wrap.className = "subrole-block";
+  wrap.innerHTML = `
+    <div class="subrole-block-header">
+      <input type="text" class="form-control subrole-title-input" placeholder="Role title (e.g. HR Business Partner)" value="${title.replace(/"/g, '&quot;')}"/>
+      <button type="button" class="remove-subrole-btn">Remove</button>
+    </div>
+    <textarea class="form-control subrole-bullets-input" rows="3" placeholder="Achievements / JD — one per line">${bullets.join("\n")}</textarea>
+  `;
+  wrap.querySelector(".remove-subrole-btn").addEventListener("click", () => wrap.remove());
+  el("subroleRepeater").appendChild(wrap);
 }
 
-function serializeSubroles(subroles) {
-  return (subroles || []).map(sr =>
-    `## ${sr.title}\n${(sr.bullets || []).map(b => `- ${b}`).join("\n")}`
-  ).join("\n\n");
+el("addSubroleBtn").addEventListener("click", () => addSubroleBlock());
+addSubroleBlock(); // start with one blank block ready to fill in
+
+function collectSubroles() {
+  return Array.from(el("subroleRepeater").querySelectorAll(".subrole-block")).map(block => ({
+    title: block.querySelector(".subrole-title-input").value.trim(),
+    bullets: block.querySelector(".subrole-bullets-input").value.split("\n").map(l => l.trim()).filter(Boolean)
+  })).filter(sr => sr.title);
 }
 
 function clearExpForm() {
   el("expId").value = "";
   el("expRole").value = "";
   el("expCompany").value = "";
+  el("expCompanyLink").value = "";
   el("expYears").value = "";
+  el("expTagline").value = "";
+  el("expRoleCategory").value = "";
   el("expOrder").value = "";
-  el("expSubroles").value = "";
+  el("subroleRepeater").innerHTML = "";
 }
-el("clearExpForm").addEventListener("click", clearExpForm);
+el("clearExpForm").addEventListener("click", () => { clearExpForm(); addSubroleBlock(); });
 
 async function loadExperience() {
   const snap = await getDocs(query(collection(db, "experience"), orderBy("order", "asc")));
@@ -287,9 +295,14 @@ async function loadExperience() {
     el("expId").value = b.dataset.edit;
     el("expRole").value = e.role || "";
     el("expCompany").value = e.company || "";
+    el("expCompanyLink").value = e.companyLink || "";
     el("expYears").value = e.years || "";
+    el("expTagline").value = e.tagline || "";
+    el("expRoleCategory").value = e.roleCategory || "";
     el("expOrder").value = e.order ?? "";
-    el("expSubroles").value = serializeSubroles(e.subroles);
+    el("subroleRepeater").innerHTML = "";
+    (e.subroles || []).forEach(sr => addSubroleBlock(sr.title, sr.bullets));
+    if (!(e.subroles || []).length) addSubroleBlock();
   }));
   list.querySelectorAll("[data-delete]").forEach(b => b.addEventListener("click", async () => {
     if (!confirm("Delete this experience entry?")) return;
@@ -302,9 +315,12 @@ el("saveExp").addEventListener("click", async () => {
   const data = {
     role: el("expRole").value,
     company: el("expCompany").value,
+    companyLink: el("expCompanyLink").value,
     years: el("expYears").value,
+    tagline: el("expTagline").value,
+    roleCategory: el("expRoleCategory").value,
     order: Number(el("expOrder").value) || 0,
-    subroles: parseSubroles(el("expSubroles").value)
+    subroles: collectSubroles()
   };
   const id = el("expId").value;
   el("expMsg").style.color = "";
