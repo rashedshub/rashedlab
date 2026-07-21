@@ -235,14 +235,16 @@ el("saveSkill").addEventListener("click", async () => {
 });
 
 // ── Experience (with sub-roles) ────────────────────────────
-function addSubroleBlock(title = "", bullets = []) {
+function addSubroleBlock(title = "", bullets = [], icon = "") {
   const wrap = document.createElement("div");
   wrap.className = "subrole-block";
   wrap.innerHTML = `
     <div class="subrole-block-header">
-      <input type="text" class="form-control subrole-title-input" placeholder="Role title (e.g. HR Business Partner)" value="${title.replace(/"/g, '&quot;')}"/>
+      <input type="text" class="form-control subrole-title-input" placeholder="Role title (e.g. HR Business Partner)" value="${title.replace(/"/g, '&quot;')}" style="flex:2;"/>
+      <input type="text" class="form-control subrole-icon-input" placeholder="fa-people-arrows" value="${icon.replace(/"/g, '&quot;')}" style="flex:1;"/>
       <button type="button" class="remove-subrole-btn">Remove</button>
     </div>
+    <p style="color:rgba(242,242,242,0.45);font-size:0.76rem;margin:-6px 0 8px;">Icon shown on Home — <a href="https://fontawesome.com/v5/search?m=free" target="_blank" rel="noopener" style="color:var(--primary);">browse Font Awesome icons</a></p>
     <textarea class="form-control subrole-bullets-input" rows="3" placeholder="Achievements / JD — one per line">${bullets.join("\n")}</textarea>
   `;
   wrap.querySelector(".remove-subrole-btn").addEventListener("click", () => wrap.remove());
@@ -255,6 +257,7 @@ addSubroleBlock(); // start with one blank block ready to fill in
 function collectSubroles() {
   return Array.from(el("subroleRepeater").querySelectorAll(".subrole-block")).map(block => ({
     title: block.querySelector(".subrole-title-input").value.trim(),
+    icon: block.querySelector(".subrole-icon-input").value.trim(),
     bullets: block.querySelector(".subrole-bullets-input").value.split("\n").map(l => l.trim()).filter(Boolean)
   })).filter(sr => sr.title);
 }
@@ -301,7 +304,7 @@ async function loadExperience() {
     el("expRoleCategory").value = e.roleCategory || "";
     el("expOrder").value = e.order ?? "";
     el("subroleRepeater").innerHTML = "";
-    (e.subroles || []).forEach(sr => addSubroleBlock(sr.title, sr.bullets));
+    (e.subroles || []).forEach(sr => addSubroleBlock(sr.title, sr.bullets, sr.icon || ""));
     if (!(e.subroles || []).length) addSubroleBlock();
   }));
   list.querySelectorAll("[data-delete]").forEach(b => b.addEventListener("click", async () => {
