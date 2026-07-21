@@ -118,17 +118,16 @@ const DEFAULT_EXPERIENCE = [
     if (!snap.empty) experience = snap.docs.map(d => d.data());
   } catch (err) { /* keep defaults */ }
 
-  container.innerHTML = experience.map(e => `
-    <div class="position-relative mb-4">
-      <span class="bi bi-arrow-right fs-4 text-light position-absolute" style="top: -5px; left: -50px;"></span>
-      <h5 class="mb-1">${e.role || ""}</h5>
-      <p class="mb-2">${e.company || ""} ${e.years ? `| <small>${e.years}</small>` : ""}</p>
-      ${e.tagline ? `<p class="fst-italic mb-2" style="opacity:0.75;">${e.tagline}</p>` : ""}
-      ${(e.subroles && e.subroles.length) ? `
-        <ul class="mb-0 ps-3">
-          ${e.subroles.map(sr => `<li class="mb-1">${sr.title || ""}</li>`).join("")}
-        </ul>
-      ` : (e.description ? `<p>${e.description}</p>` : "")}
+  const subroleIcons = ["fa-people-arrows", "fa-chart-line", "fa-money-check-alt", "fa-chalkboard-teacher", "fa-clipboard-list", "fa-shield-alt", "fa-users"];
+  const allSubroles = experience.flatMap(e => e.subroles || []);
+
+  container.innerHTML = allSubroles.map((sr, i) => `
+    <div class="col-md-6">
+      <div class="service-item">
+        <i class="fa fa-2x ${subroleIcons[i % subroleIcons.length]} mx-auto mb-4"></i>
+        <h5 class="mb-2">${sr.title || ""}</h5>
+        <p class="mb-0">${(sr.bullets && sr.bullets[0]) || ""}</p>
+      </div>
     </div>
   `).join("");
 })();
@@ -191,5 +190,3 @@ const DEFAULT_SERVICES = [
     console.error("Failed to load portfolio:", err);
   }
 })();
-
-
