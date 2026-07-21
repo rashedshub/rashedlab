@@ -123,7 +123,12 @@ const DEFAULT_EXPERIENCE = [
       <span class="bi bi-arrow-right fs-4 text-light position-absolute" style="top: -5px; left: -50px;"></span>
       <h5 class="mb-1">${e.role || ""}</h5>
       <p class="mb-2">${e.company || ""} ${e.years ? `| <small>${e.years}</small>` : ""}</p>
-      ${(e.subroles && e.subroles.length) ? `<p>${e.subroles.map(sr => sr.title).filter(Boolean).join(" · ")}</p>` : (e.description ? `<p>${e.description}</p>` : "")}
+      ${e.tagline ? `<p class="fst-italic mb-2" style="opacity:0.75;">${e.tagline}</p>` : ""}
+      ${(e.subroles && e.subroles.length) ? `
+        <ul class="mb-0 ps-3">
+          ${e.subroles.map(sr => `<li class="mb-1">${sr.title || ""}</li>`).join("")}
+        </ul>
+      ` : (e.description ? `<p>${e.description}</p>` : "")}
     </div>
   `).join("");
 })();
