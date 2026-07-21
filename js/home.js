@@ -124,7 +124,7 @@ const DEFAULT_EXPERIENCE = [
   container.innerHTML = allSubroles.map((sr, i) => `
     <div class="col-md-6">
       <div class="service-item">
-        <i class="fa fa-2x ${subroleIcons[i % subroleIcons.length]} mx-auto mb-4"></i>
+        <i class="fa fa-2x ${sr.icon || subroleIcons[i % subroleIcons.length]} mx-auto mb-4"></i>
         <h5 class="mb-2">${sr.title || ""}</h5>
         <p class="mb-0">${(sr.bullets && sr.bullets[0]) || ""}</p>
       </div>
