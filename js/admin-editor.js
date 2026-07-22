@@ -244,7 +244,7 @@ function addSubroleBlock(title = "", bullets = [], icon = "") {
       <input type="text" class="form-control subrole-icon-input" placeholder="fa-people-arrows" value="${icon.replace(/"/g, '&quot;')}" style="flex:1;"/>
       <button type="button" class="remove-subrole-btn">Remove</button>
     </div>
-    <p style="color:rgba(242,242,242,0.45);font-size:0.76rem;margin:-6px 0 8px;">Icon shown on Home — <a href="https://fontawesome.com/v5/search?m=free" target="_blank" rel="noopener" style="color:var(--primary);">browse Font Awesome icons</a></p>
+    <p style="color:rgba(242,242,242,0.45);font-size:0.76rem;margin:-6px 0 8px;">Icon shown on Home — <a href="https://fontawesome.com/search?o=r&m=free&s=solid" target="_blank" rel="noopener" style="color:var(--primary);">browse free solid icons</a> (make sure "Free" filter is on)</p>
     <textarea class="form-control subrole-bullets-input" rows="3" placeholder="Achievements / JD — one per line">${bullets.join("\n")}</textarea>
   `;
   wrap.querySelector(".remove-subrole-btn").addEventListener("click", () => wrap.remove());
