@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="portfolio.css"/>
 <link rel="stylesheet" href="css/mainnav.css"/>
 <link rel="stylesheet" href="css/resume-cv.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <nav class="mainnav" id="mainnav">
@@ -54,6 +56,13 @@
           </svg>
           Download PDF
         </button>
+        <button id="downloadDocBtn" class="cv-download-btn cv-download-btn-secondary">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right:6px;vertical-align:-2px;">
+            <path d="M8 1v9m0 0L4.5 6.5M8 10l3.5-3.5M2 12.5v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Download DOC
+        </button>
+        <p id="downloadStatus" class="cv-download-status"></p>
 
         <div class="cv-side-block">
           <h3>Contact</h3>
@@ -132,10 +141,6 @@
   <script type="module" src="js/auth-nav.js"></script>
   <script type="module" src="js/resume.js"></script>
   <script src="js/mainnav.js"></script>
-  <script>
-    document.getElementById("downloadResumeBtn").addEventListener("click", function () {
-      window.print();
-    });
-  </script>
+  <script src="js/resume-export.js"></script>
 </body>
 </html>

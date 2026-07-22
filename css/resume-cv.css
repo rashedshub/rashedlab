@@ -68,6 +68,10 @@
   margin-bottom: 28px;
 }
 .cv-download-btn:hover { background: var(--brass, #B6863A); }
+.cv-download-btn-secondary { background: #fff; color: #111827; border: 1.5px solid #111827; margin-top: 8px; }
+.cv-download-btn-secondary:hover { background: #111827; color: #fff; }
+.cv-download-btn:disabled { opacity: 0.6; cursor: default; }
+.cv-download-status { font-size: 0.76rem; color: #6b7280; margin: 8px 0 0; min-height: 1em; }
 
 .cv-side-block {
   text-align: left;
