@@ -1,0 +1,267 @@
+/* ============================================================
+   Two-column interactive CV layout for resume.html
+   Standard, clean palette: white surface, near-black text,
+   a single restrained navy/brass accent — conventional CV look.
+   ============================================================ */
+
+.cv-page {
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+.cv-grid {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 24px 90px;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 44px;
+  align-items: start;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.cv-sidebar {
+  position: sticky;
+  top: 112px;
+  text-align: center;
+  padding-right: 8px;
+}
+
+.cv-photo {
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #111827;
+  margin-bottom: 18px;
+}
+
+.cv-name {
+  font-size: 1.3rem;
+  color: #111827;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.cv-headline {
+  font-size: 0.85rem;
+  color: var(--brass, #B6863A);
+  font-weight: 600;
+  margin: 0 0 18px;
+}
+
+.cv-download-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 16px;
+  background: #111827;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  margin-bottom: 28px;
+}
+.cv-download-btn:hover { background: var(--brass, #B6863A); }
+
+.cv-side-block {
+  text-align: left;
+  padding-top: 18px;
+  margin-top: 18px;
+  border-top: 1px solid #e5e7eb;
+}
+.cv-side-block:first-of-type { border-top: none; margin-top: 0; }
+
+.cv-side-block h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin: 0 0 12px;
+}
+
+.cv-contact-list { list-style: none; margin: 0; padding: 0; }
+.cv-contact-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #374151;
+  margin-bottom: 10px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+.cv-contact-list li svg { flex-shrink: 0; margin-top: 2px; color: var(--brass, #B6863A); }
+.cv-contact-list li a { color: #374151; text-decoration: none; }
+.cv-contact-list li a:hover { color: var(--brass, #B6863A); }
+
+.cv-side-text { font-size: 0.82rem; color: #374151; line-height: 1.6; }
+
+.cv-skill-group { margin-bottom: 14px; }
+.cv-skill-group:last-child { margin-bottom: 0; }
+.cv-skill-group-title { font-size: 0.76rem; font-weight: 700; color: #111827; margin-bottom: 6px; }
+.cv-skill-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.cv-skill-tags span {
+  font-size: 0.72rem;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  padding: 3px 9px;
+  border-radius: 3px;
+}
+
+.cv-interest-line { margin-bottom: 8px; }
+.cv-interest-line:last-child { margin-bottom: 0; }
+.cv-interest-line .ti { font-weight: 600; color: #111827; display: block; font-size: 0.82rem; }
+.cv-interest-line .ts { color: #6b7280; font-size: 0.76rem; }
+
+/* ── Main column ─────────────────────────────────────────── */
+.cv-main { min-width: 0; }
+
+.cv-section { margin-bottom: 38px; }
+.cv-section:last-child { margin-bottom: 0; }
+
+.cv-section h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  color: #111827;
+  margin: 0 0 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #111827;
+}
+
+.cv-summary { color: #374151; font-size: 0.98rem; line-height: 1.75; }
+
+/* Experience — interactive accordion sub-roles */
+.exp-block { margin-bottom: 26px; }
+.exp-block:last-child { margin-bottom: 0; }
+.exp-block .exp-company { font-weight: 700; color: #111827; font-size: 1rem; }
+.exp-block .exp-company a { color: inherit; }
+.exp-block .exp-role { color: var(--brass, #B6863A); font-weight: 600; font-size: 0.92rem; }
+.exp-block .exp-years { color: #6b7280; font-size: 0.8rem; margin-bottom: 6px; }
+.exp-block .exp-tagline { color: #6b7280; font-size: 0.84rem; font-style: italic; margin: 4px 0; }
+.exp-block .exp-role-category {
+  font-weight: 700; color: #111827; font-size: 0.82rem;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin: 14px 0 6px;
+}
+
+.subrole {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.subrole-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 14px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #111827;
+  font-size: 0.9rem;
+  background: #fafafa;
+  user-select: none;
+}
+.subrole-title:hover { background: #f3f4f6; }
+
+.subrole-title .chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: #9ca3af;
+}
+.subrole.open .subrole-title .chevron { transform: rotate(180deg); }
+
+.subrole-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+.subrole.open .subrole-body { max-height: 600px; }
+
+.subrole-body ul { margin: 0; padding: 12px 16px 14px 32px; }
+.subrole-body li { font-size: 0.88rem; color: #374151; margin-bottom: 5px; line-height: 1.5; }
+
+/* Achievements */
+.achv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.achv-card { background: #fafafa; border: 1px solid #e5e7eb; border-radius: 6px; padding: 16px; }
+.achv-card .achv-title { font-weight: 700; color: #111827; font-size: 0.88rem; margin-bottom: 6px; }
+.achv-card .achv-desc { font-size: 0.82rem; color: #6b7280; line-height: 1.5; }
+
+/* Generic timeline entries (Projects / Education / Training / Certifications) */
+.cv-main .entry { margin-bottom: 18px; }
+.cv-main .entry:last-child { margin-bottom: 0; }
+.cv-main .entry .role { font-weight: 700; color: #111827; font-size: 0.92rem; }
+.cv-main .entry .meta { color: #6b7280; font-size: 0.78rem; margin-bottom: 4px; }
+.cv-main .entry p { color: #374151; font-size: 0.86rem; line-height: 1.55; }
+.cv-main .entry ul { margin: 6px 0 0 18px; padding: 0; }
+.cv-main .entry li { color: #374151; font-size: 0.86rem; margin-bottom: 3px; }
+.cv-main .entry a { color: var(--brass, #B6863A); }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .cv-grid { grid-template-columns: 1fr; gap: 32px; }
+  .cv-sidebar { position: static; text-align: left; display: grid; grid-template-columns: auto 1fr; gap: 16px 24px; align-items: start; }
+  .cv-photo { grid-row: span 2; margin-bottom: 0; width: 96px; height: 96px; }
+  .cv-name, .cv-headline, .cv-download-btn { grid-column: 2; }
+  .cv-download-btn { grid-column: 1 / -1; width: auto; margin-top: 6px; }
+  .cv-side-block { grid-column: 1 / -1; }
+}
+
+/* ── Print — force single column, expand all accordions ──── */
+@media print {
+  @page { margin: 12mm 14mm; }
+  body { padding-top: 0 !important; background: #fff !important; }
+  .mainnav, .site-footer, .cv-download-btn, #authNav { display: none !important; }
+
+  .cv-grid { display: block !important; max-width: 100% !important; padding: 0 !important; }
+  .cv-sidebar {
+    position: static !important;
+    text-align: left !important;
+    border-bottom: 2px solid #000;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    display: flex !important;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .cv-photo { width: 80px !important; height: 80px !important; margin-bottom: 0 !important; border-color: #000 !important; }
+  .cv-name, .cv-headline { color: #000 !important; }
+  .cv-side-block { border: none !important; margin: 0 !important; padding: 0 !important; flex: 1 1 200px; }
+  .cv-side-block h3 { color: #000 !important; }
+  .cv-contact-list li, .cv-side-text { color: #222 !important; font-size: 0.72rem !important; }
+  .cv-skill-tags span { border-color: #999 !important; background: #fff !important; color: #000 !important; }
+
+  .cv-section h2 { color: #000 !important; border-color: #000 !important; font-size: 1rem !important; }
+  .cv-summary { color: #222 !important; font-size: 0.85rem !important; }
+
+  .exp-block { break-inside: avoid; }
+  .exp-block .exp-company, .exp-block .exp-role, .exp-block .exp-role-category { color: #000 !important; }
+  .exp-block .exp-years, .exp-block .exp-tagline { color: #444 !important; }
+
+  .subrole { border-color: #ccc !important; break-inside: avoid; }
+  .subrole-title { background: #fff !important; color: #000 !important; }
+  .subrole-title .chevron { display: none !important; }
+  .subrole-body { max-height: none !important; }
+  .subrole-body li { color: #222 !important; font-size: 0.78rem !important; }
+
+  .achv-card { border-color: #ccc !important; background: #fff !important; break-inside: avoid; }
+  .achv-card .achv-title, .achv-card .achv-desc { color: #000 !important; }
+
+  .cv-main .entry .role { color: #000 !important; }
+  .cv-main .entry .meta { color: #444 !important; }
+  .cv-main .entry p, .cv-main .entry li { color: #222 !important; }
+
+  a { text-decoration: none; color: inherit; }
+}

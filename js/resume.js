@@ -104,27 +104,53 @@ const DEFAULT_CERTS = [
     if (snap.exists() && Object.keys(snap.data()).length) d = { ...DEFAULT_HEADER, ...snap.data() };
   } catch (err) { /* keep defaults */ }
 
+  // Profile photo — pulled from the same Firestore field the admin's
+  // About Me photo uploader writes to (site_content/home.photoURL)
+  try {
+    const homeSnap = await getDoc(doc(db, "site_content", "home"));
+    if (homeSnap.exists() && homeSnap.data().photoURL) {
+      document.getElementById("rPhoto").src = homeSnap.data().photoURL;
+    }
+  } catch (err) { /* keep default image */ }
+
   set("rName", d.name);
   set("rHeadline", d.headline);
-  set("rContactLine", [d.location, d.email, d.phone].filter(Boolean).join(" \u00b7 "));
-  const line2 = [d.website, d.birthday].filter(Boolean).join(" \u00b7 ");
-  set("rContactLine2", line2);
   set("rSummary", d.summary);
   set("rLanguages", d.languages);
   set("rReferences", d.references);
 
+  const icons = {
+    location: `<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1c-2.8 0-5 2.2-5 5 0 3.75 5 9 5 9s5-5.25 5-9c0-2.8-2.2-5-5-5Zm0 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z" fill="currentColor"/></svg>`,
+    email: `<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 4l6.5 5 6.5-5" stroke="currentColor" stroke-width="1.3"/></svg>`,
+    phone: `<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 2h2.5l1 3.5-1.5 1.2a9 9 0 0 0 4.3 4.3l1.2-1.5 3.5 1V14a1 1 0 0 1-1 1C7 15 1 9 1 3a1 1 0 0 1 1-1Z" fill="currentColor"/></svg>`,
+    website: `<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 8h13M8 1.5c1.8 1.8 2.7 4 2.7 6.5S9.8 12.7 8 14.5C6.2 12.7 5.3 10.5 5.3 8S6.2 3.3 8 1.5Z" stroke="currentColor" stroke-width="1.3"/></svg>`,
+    calendar: `<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 6h13M5 1v3M11 1v3" stroke="currentColor" stroke-width="1.3"/></svg>`
+  };
+
+  const contactEl = document.getElementById("cvContactList");
+  if (contactEl) {
+    const rows = [
+      d.location ? { icon: icons.location, html: d.location } : null,
+      d.email ? { icon: icons.email, html: `<a href="mailto:${d.email}">${d.email}</a>` } : null,
+      d.phone ? { icon: icons.phone, html: d.phone } : null,
+      d.website ? { icon: icons.website, html: `<a href="${d.website}" target="_blank" rel="noopener">${d.website.replace(/^https?:\/\//, "")}</a>` } : null,
+      d.birthday ? { icon: icons.calendar, html: d.birthday } : null
+    ].filter(Boolean);
+    contactEl.innerHTML = rows.map(r => `<li>${r.icon}<span>${r.html}</span></li>`).join("");
+  }
+
   const groupsEl = document.getElementById("resumeSkillGroups");
   if (groupsEl) {
     const groups = [
-      { title: "HR & Business Skills", raw: d.skillsHR },
-      { title: "Technical Skills", raw: d.skillsTechnical },
-      { title: "Leadership Skills", raw: d.skillsLeadership }
+      { title: "HR & Business", raw: d.skillsHR },
+      { title: "Technical", raw: d.skillsTechnical },
+      { title: "Leadership", raw: d.skillsLeadership }
     ].filter(g => g.raw);
     groupsEl.innerHTML = groups.map(g => `
-      <div class="skill-group">
-        <div class="skill-group-title">${g.title}</div>
-        <div class="skill-group-tags">
-          ${g.raw.split(",").map(s => s.trim()).filter(Boolean).map(s => `<span class="skill-tag">${s}</span>`).join("")}
+      <div class="cv-skill-group">
+        <div class="cv-skill-group-title">${g.title}</div>
+        <div class="cv-skill-tags">
+          ${g.raw.split(",").map(s => s.trim()).filter(Boolean).map(s => `<span>${s}</span>`).join("")}
         </div>
       </div>
     `).join("");
@@ -135,16 +161,16 @@ const DEFAULT_CERTS = [
     const lines = d.interests.split("\n").map(l => l.trim()).filter(Boolean);
     interestsEl.innerHTML = lines.map(line => {
       const [title, sub] = line.split("|").map(s => (s || "").trim());
-      return `<div class="interest-card">
-        <div class="interest-title">${title}</div>
-        ${sub ? `<div class="interest-sub">${sub}</div>` : ""}
+      return `<div class="cv-interest-line">
+        <span class="ti">${title}</span>
+        ${sub ? `<span class="ts">${sub}</span>` : ""}
       </div>`;
     }).join("");
   }
 
   const volEl = document.getElementById("resumeVolunteering");
   if (volEl && d.volunteeringTitle) {
-    volEl.innerHTML = `<div class="entry" style="border:none;padding-left:0;">
+    volEl.innerHTML = `<div class="entry">
       <div class="role">${d.volunteeringTitle}</div>
       <p>${d.volunteeringDesc || ""}</p>
     </div>`;
@@ -169,13 +195,24 @@ const DEFAULT_CERTS = [
       ${e.tagline ? `<p class="exp-tagline">${e.tagline}</p>` : ""}
       ${e.roleCategory ? `<div class="exp-role-category">${e.roleCategory}</div>` : ""}
       ${(e.subroles || []).map(sr => `
-        <div class="subrole">
-          <div class="subrole-title">${sr.title || ""}</div>
-          <ul>${(sr.bullets || []).map(b => `<li>${b}</li>`).join("")}</ul>
+        <div class="subrole open">
+          <div class="subrole-title">
+            <span>${sr.title || ""}</span>
+            <svg class="chevron" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="subrole-body">
+            <ul>${(sr.bullets || []).map(b => `<li>${b}</li>`).join("")}</ul>
+          </div>
         </div>
       `).join("")}
     </div>
   `).join("");
+
+  container.querySelectorAll(".subrole-title").forEach(title => {
+    title.addEventListener("click", () => {
+      title.closest(".subrole").classList.toggle("open");
+    });
+  });
 })();
 
 /* ── Key Achievements ────────────────────────────────────────── */
