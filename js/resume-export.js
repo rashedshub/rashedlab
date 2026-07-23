@@ -103,12 +103,6 @@ function buildExportHTML(d) {
     `).join(""));
   }
 
-  if (d.achievements.length) {
-    sectionsHTML.push(`<h2>Key Achievements</h2>` + d.achievements.map(a => `
-      <div class="blk"><div class="role-line">${esc(a.title)}</div><p>${esc(a.description)}</p></div>
-    `).join(""));
-  }
-
   function entriesBlock(title, entries) {
     if (!entries.length) return "";
     return `<h2>${title}</h2>` + entries.map(e => `
@@ -122,13 +116,37 @@ function buildExportHTML(d) {
     `).join("");
   }
 
-  sectionsHTML.push(entriesBlock("Projects", d.projects));
   sectionsHTML.push(entriesBlock("Education", d.education));
   sectionsHTML.push(entriesBlock("Training / Short Courses", d.training));
   sectionsHTML.push(entriesBlock("Certifications", d.certifications));
   sectionsHTML.push(entriesBlock("Volunteering", d.volunteering));
 
   if (d.references) sectionsHTML.push(`<h2>References</h2><p>${esc(d.references)}</p>`);
+
+  // Key Achievements & Projects render in the LEFT sidebar column for
+  // PDF/DOC exports specifically (kept in the main column on the live page).
+  const achievementsSideHTML = d.achievements.length ? `
+    <div class="side-block">
+      <div class="side-h">Key Achievements</div>
+      ${d.achievements.map(a => `
+        <div class="side-entry">
+          <div class="side-entry-title">${esc(a.title)}</div>
+          <div class="side-entry-desc">${esc(a.description)}</div>
+        </div>
+      `).join("")}
+    </div>` : "";
+
+  const projectsSideHTML = d.projects.length ? `
+    <div class="side-block">
+      <div class="side-h">Projects</div>
+      ${d.projects.map(p => `
+        <div class="side-entry">
+          ${p.role ? `<div class="side-entry-title">${esc(p.role)}</div>` : ""}
+          ${p.meta ? `<div class="side-entry-meta">${esc(p.meta)}</div>` : ""}
+          ${p.items.length ? `<ul>${p.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : ""}
+        </div>
+      `).join("")}
+    </div>` : "";
 
   const sidebarHTML = `
     <div class="side">
@@ -157,6 +175,9 @@ function buildExportHTML(d) {
           <div class="side-h">Interests</div>
           ${d.interests.map(i => `<div class="side-line"><strong>${esc(i.title)}</strong>${i.sub ? ` — ${esc(i.sub)}` : ""}</div>`).join("")}
         </div>` : ""}
+
+      ${achievementsSideHTML}
+      ${projectsSideHTML}
     </div>
   `;
 
@@ -181,6 +202,13 @@ const EXPORT_STYLES = `
   .side-line { font-size: 9pt; color: #374151; margin-bottom: 5px; line-height: 1.4; }
   .skill-g { margin-bottom: 8px; }
   .skill-g-t { font-size: 8.5pt; font-weight: 700; color: #111827; }
+  .side-entry { margin-bottom: 10px; }
+  .side-entry:last-child { margin-bottom: 0; }
+  .side-entry-title { font-size: 8.8pt; font-weight: 700; color: #111827; line-height: 1.35; }
+  .side-entry-meta { font-size: 8pt; color: #6b7280; margin-bottom: 2px; }
+  .side-entry-desc { font-size: 8.3pt; color: #374151; line-height: 1.4; }
+  .side-entry ul { margin: 3px 0 0 14px; padding: 0; }
+  .side-entry li { font-size: 8.3pt; color: #374151; margin-bottom: 2px; line-height: 1.4; }
   h2 { font-size: 12pt; color: #111827; border-bottom: 2px solid #111827; padding-bottom: 5px; margin: 16px 0 10px; }
   .blk { margin-bottom: 14px; }
   .role-line { font-weight: 700; color: #111827; font-size: 10.5pt; }
