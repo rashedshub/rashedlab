@@ -203,14 +203,24 @@
 .achv-card .achv-desc { font-size: 0.82rem; color: #6b7280; line-height: 1.5; }
 
 /* Generic timeline entries (Projects / Education / Training / Certifications) */
-.cv-main .entry { margin-bottom: 18px; }
-.cv-main .entry:last-child { margin-bottom: 0; }
-.cv-main .entry .role { font-weight: 700; color: #111827; font-size: 0.92rem; }
-.cv-main .entry .meta { color: #6b7280; font-size: 0.78rem; margin-bottom: 4px; }
-.cv-main .entry p { color: #374151; font-size: 0.86rem; line-height: 1.55; }
-.cv-main .entry ul { margin: 6px 0 0 18px; padding: 0; }
-.cv-main .entry li { color: #374151; font-size: 0.86rem; margin-bottom: 3px; }
-.cv-main .entry a { color: var(--brass, #B6863A); }
+.cv-main .entry, .cv-sidebar .entry { margin-bottom: 18px; }
+.cv-main .entry:last-child, .cv-sidebar .entry:last-child { margin-bottom: 0; }
+.cv-main .entry .role, .cv-sidebar .entry .role { font-weight: 700; color: #111827; font-size: 0.92rem; }
+.cv-main .entry .meta, .cv-sidebar .entry .meta { color: #6b7280; font-size: 0.78rem; margin-bottom: 4px; }
+.cv-main .entry p, .cv-sidebar .entry p { color: #374151; font-size: 0.86rem; line-height: 1.55; }
+.cv-main .entry ul, .cv-sidebar .entry ul { margin: 6px 0 0 18px; padding: 0; }
+.cv-main .entry li, .cv-sidebar .entry li { color: #374151; font-size: 0.86rem; margin-bottom: 3px; }
+.cv-main .entry a, .cv-sidebar .entry a { color: var(--brass, #B6863A); }
+
+/* Achievements & Projects live in the sidebar now — single column, tighter type */
+.cv-sidebar .achv-grid { grid-template-columns: 1fr; gap: 10px; }
+.cv-sidebar .achv-card { padding: 12px; }
+.cv-sidebar .achv-card .achv-title { font-size: 0.8rem; }
+.cv-sidebar .achv-card .achv-desc { font-size: 0.76rem; }
+.cv-sidebar .entry { margin-bottom: 14px; }
+.cv-sidebar .entry .role { font-size: 0.82rem; }
+.cv-sidebar .entry .meta { font-size: 0.72rem; }
+.cv-sidebar .entry p, .cv-sidebar .entry li { font-size: 0.78rem; }
 
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 860px) {
@@ -243,6 +253,7 @@
   .cv-photo { width: 80px !important; height: 80px !important; margin-bottom: 0 !important; border-color: #000 !important; }
   .cv-name, .cv-headline { color: #000 !important; }
   .cv-side-block { border: none !important; margin: 0 !important; padding: 0 !important; flex: 1 1 200px; }
+  .cv-side-block.cv-print-full { flex-basis: 100% !important; width: 100% !important; margin-top: 10px !important; }
   .cv-side-block h3 { color: #000 !important; }
   .cv-contact-list li, .cv-side-text { color: #222 !important; font-size: 0.72rem !important; }
   .cv-skill-tags span { border-color: #999 !important; background: #fff !important; color: #000 !important; }
@@ -263,9 +274,9 @@
   .achv-card { border-color: #ccc !important; background: #fff !important; break-inside: avoid; }
   .achv-card .achv-title, .achv-card .achv-desc { color: #000 !important; }
 
-  .cv-main .entry .role { color: #000 !important; }
-  .cv-main .entry .meta { color: #444 !important; }
-  .cv-main .entry p, .cv-main .entry li { color: #222 !important; }
+  .cv-main .entry .role, .cv-sidebar .entry .role { color: #000 !important; }
+  .cv-main .entry .meta, .cv-sidebar .entry .meta { color: #444 !important; }
+  .cv-main .entry p, .cv-main .entry li, .cv-sidebar .entry p, .cv-sidebar .entry li { color: #222 !important; }
 
   a { text-decoration: none; color: inherit; }
 }
