@@ -197,26 +197,26 @@ const EXPORT_STYLES = `
   .photo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #111827; margin-bottom: 10px; }
   .name { font-size: 15pt; font-weight: 700; color: #111827; }
   .headline { font-size: 10pt; font-weight: 600; color: #92702c; margin-bottom: 14px; }
-  .side-block { margin-top: 14px; padding-top: 10px; border-top: 1px solid #e5e7eb; }
+  .side-block { margin-top: 14px; padding-top: 10px; border-top: 1px solid #e5e7eb; page-break-inside: avoid; mso-pagination: avoid; }
   .side-h { font-size: 8pt; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
   .side-line { font-size: 9pt; color: #374151; margin-bottom: 5px; line-height: 1.4; }
   .skill-g { margin-bottom: 8px; }
   .skill-g-t { font-size: 8.5pt; font-weight: 700; color: #111827; }
-  .side-entry { margin-bottom: 10px; }
+  .side-entry { margin-bottom: 10px; page-break-inside: avoid; mso-pagination: avoid; }
   .side-entry:last-child { margin-bottom: 0; }
   .side-entry-title { font-size: 8.8pt; font-weight: 700; color: #111827; line-height: 1.35; }
   .side-entry-meta { font-size: 8pt; color: #6b7280; margin-bottom: 2px; }
   .side-entry-desc { font-size: 8.3pt; color: #374151; line-height: 1.4; }
   .side-entry ul { margin: 3px 0 0 14px; padding: 0; }
   .side-entry li { font-size: 8.3pt; color: #374151; margin-bottom: 2px; line-height: 1.4; }
-  h2 { font-size: 12pt; color: #111827; border-bottom: 2px solid #111827; padding-bottom: 5px; margin: 16px 0 10px; }
-  .blk { margin-bottom: 14px; }
+  h2 { font-size: 12pt; color: #111827; border-bottom: 2px solid #111827; padding-bottom: 5px; margin: 16px 0 10px; page-break-after: avoid; mso-pagination: avoid; }
+  .blk { margin-bottom: 14px; page-break-inside: avoid; mso-pagination: avoid; }
   .role-line { font-weight: 700; color: #111827; font-size: 10.5pt; }
   .sub-line { color: #92702c; font-weight: 600; font-size: 9.5pt; }
   .meta-line { color: #6b7280; font-size: 8.5pt; margin-bottom: 4px; }
   .italic-line { color: #6b7280; font-style: italic; font-size: 9pt; margin: 3px 0; }
   .cat-line { font-weight: 700; text-transform: uppercase; font-size: 8.5pt; letter-spacing: 0.5px; margin: 8px 0 3px; }
-  .subrole-blk { margin: 6px 0 6px 0; }
+  .subrole-blk { margin: 6px 0 6px 0; page-break-inside: avoid; mso-pagination: avoid; }
   .subrole-h { font-weight: 700; font-size: 9.5pt; color: #111827; }
   p { font-size: 9.5pt; line-height: 1.5; color: #374151; margin: 4px 0; }
   ul { margin: 4px 0 4px 18px; padding: 0; }
@@ -249,31 +249,100 @@ document.getElementById("downloadResumeBtn").addEventListener("click", async () 
   document.body.appendChild(wrapper);
 
   try {
-    const canvas = await html2canvas(wrapper, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+    // Collect the vertical span [top, bottom) of every atomic, "don't
+    // split me" block in BOTH columns (relative to the wrapper) BEFORE
+    // rasterizing. We then merge overlapping/adjacent spans so we know
+    // exactly which Y-ranges are "occupied" — a page break is only ever
+    // allowed to land in the gaps between them, never inside one, in
+    // either column, so a section can never straddle two pages.
+    const SCALE = 2; // must match html2canvas scale below
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const atomicSelectors = ".blk, .subrole-blk, .side-block, .side-entry";
+    const spans = [];
+    wrapper.querySelectorAll(atomicSelectors).forEach(elm => {
+      const r = elm.getBoundingClientRect();
+      const top = Math.round((r.top - wrapperRect.top) * SCALE);
+      const bottom = Math.round((r.bottom - wrapperRect.top) * SCALE);
+      if (bottom > top) spans.push([top, bottom]);
+    });
+    spans.sort((a, b) => a[0] - b[0]);
+
+    const merged = [];
+    for (const [s, e] of spans) {
+      if (merged.length && s <= merged[merged.length - 1][1]) {
+        merged[merged.length - 1][1] = Math.max(merged[merged.length - 1][1], e);
+      } else {
+        merged.push([s, e]);
+      }
+    }
+
+    const totalHeightPx = Math.round(wrapper.getBoundingClientRect().height * SCALE);
+    // Safe cut points: 0, the end of every merged (occupied) span, and
+    // the very bottom of the document.
+    const sortedBreaks = [0, ...merged.map(m => m[1]), totalHeightPx]
+      .filter((v, i, arr) => arr.indexOf(v) === i)
+      .sort((a, b) => a - b);
+
+    // If a candidate cut still happens to land inside some merged span
+    // (can happen right at totalHeightPx if content ends mid-span due to
+    // rounding), snap it back to that span's start instead.
+    function isInsideAnySpan(y) {
+      return merged.find(([s, e]) => y > s && y < e);
+    }
+
+    const canvas = await html2canvas(wrapper, { scale: SCALE, useCORS: true, backgroundColor: "#ffffff" });
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ unit: "mm", format: "a4" });
 
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 10; // mm
-    const usableWidth = pageWidth - margin * 2;
-    const usableHeight = pageHeight - margin * 2;
+    const pageWidthMm = pdf.internal.pageSize.getWidth();
+    const pageHeightMm = pdf.internal.pageSize.getHeight();
+    const marginMm = 10;
+    const usableWidthMm = pageWidthMm - marginMm * 2;
+    const usableHeightMm = pageHeightMm - marginMm * 2;
 
-    const imgWidthMm = usableWidth;
-    const imgHeightMm = (canvas.height * imgWidthMm) / canvas.width;
+    const pxToMm = usableWidthMm / canvas.width;
+    const maxSlicePx = Math.floor(usableHeightMm / pxToMm);
 
-    let heightLeft = imgHeightMm;
-    let position = 0;
-    const imgData = canvas.toDataURL("image/jpeg", 0.95);
+    // Walk through the sorted safe-break positions, greedily filling each
+    // page up to (but not exceeding) one page-height, always landing
+    // exactly on a section/block boundary — never mid-section.
+    let cursorPx = 0;
+    let firstPage = true;
 
-    pdf.addImage(imgData, "JPEG", margin, margin + position, imgWidthMm, imgHeightMm);
-    heightLeft -= usableHeight;
+    while (cursorPx < totalHeightPx - 1) {
+      const maxAllowed = cursorPx + maxSlicePx;
+      let cut = -1;
+      for (const bp of sortedBreaks) {
+        if (bp > cursorPx && bp <= maxAllowed) cut = bp;
+        if (bp > maxAllowed) break;
+      }
+      // Fallback: no safe boundary fits on this page at all (a single
+      // section is taller than a full page) — force a break, snapped to
+      // a span start if possible so we at least don't cut mid-line.
+      if (cut === -1) {
+        cut = Math.min(maxAllowed, totalHeightPx);
+        const insideSpan = isInsideAnySpan(cut);
+        if (insideSpan && insideSpan[0] > cursorPx) cut = insideSpan[0];
+      }
 
-    while (heightLeft > 0) {
-      position -= usableHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "JPEG", margin, margin + position, imgWidthMm, imgHeightMm);
-      heightLeft -= usableHeight;
+      const sliceHeightPx = cut - cursorPx;
+      if (sliceHeightPx <= 0) { cursorPx = totalHeightPx; break; }
+
+      const sliceCanvas = document.createElement("canvas");
+      sliceCanvas.width = canvas.width;
+      sliceCanvas.height = sliceHeightPx;
+      sliceCanvas.getContext("2d").drawImage(
+        canvas, 0, cursorPx, canvas.width, sliceHeightPx,
+        0, 0, canvas.width, sliceHeightPx
+      );
+      const sliceData = sliceCanvas.toDataURL("image/jpeg", 0.95);
+      const sliceHeightMm = sliceHeightPx * pxToMm;
+
+      if (!firstPage) pdf.addPage();
+      pdf.addImage(sliceData, "JPEG", marginMm, marginMm, usableWidthMm, sliceHeightMm);
+
+      firstPage = false;
+      cursorPx = cut;
     }
 
     pdf.save("Resume - Md Rashedul Haque.pdf");
