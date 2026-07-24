@@ -1,17 +1,15 @@
 /* ============================================================
-   Resume export — builds a real, standalone A4-formatted CV
-   from the live rendered page, then:
-   - "Download PDF": renders it via html2canvas + jsPDF into a
-     multi-page PDF with proper page margins.
-   - "Download DOC": wraps the same content in Word-compatible
-     markup and downloads it as an editable .doc file.
+   Resume export — ATS-friendly, single-column, standard format.
+   - "Download PDF": real vector text via jsPDF (no screenshots),
+     so it's genuinely parseable by Applicant Tracking Systems —
+     content just flows top-to-bottom and pages naturally.
+   - "Download DOC": same content as a simple single-column
+     Word-compatible document.
    Both read the DOM at click-time, so they always reflect
-   whatever content is currently on the page (including
-   Firestore-loaded data), regardless of script load order.
+   whatever content is currently on the page.
    ============================================================ */
 
 function text(el) { return el ? el.textContent.trim() : ""; }
-function html(el) { return el ? el.innerHTML : ""; }
 
 function extractEntries(containerId) {
   const container = document.getElementById(containerId);
@@ -45,7 +43,6 @@ function buildResumeData() {
   return {
     name: text(document.getElementById("rName")),
     headline: text(document.getElementById("rHeadline")),
-    photoSrc: document.getElementById("rPhoto") ? document.getElementById("rPhoto").src : "",
     contact: Array.from(document.querySelectorAll("#cvContactList li")).map(li => text(li)),
     skillGroups: Array.from(document.querySelectorAll("#resumeSkillGroups .cv-skill-group")).map(g => ({
       title: text(g.querySelector(".cv-skill-group-title")),
@@ -75,156 +72,6 @@ function esc(s) {
   return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/* Builds a clean, single-column, print-formatted HTML document
-   (used both as the source rendered for the PDF screenshot, and
-   as the body content embedded directly into the .doc export). */
-function buildExportHTML(d) {
-  const sectionsHTML = [];
-
-  if (d.summary) {
-    sectionsHTML.push(`<h2>Summary</h2><p>${esc(d.summary)}</p>`);
-  }
-
-  if (d.experience.length) {
-    sectionsHTML.push(`<h2>Experience</h2>` + d.experience.map(e => `
-      <div class="blk">
-        <div class="role-line">${esc(e.company)}</div>
-        <div class="sub-line">${esc(e.role)}</div>
-        <div class="meta-line">${esc(e.years)}</div>
-        ${e.tagline ? `<div class="italic-line">${esc(e.tagline)}</div>` : ""}
-        ${e.roleCategory ? `<div class="cat-line">${esc(e.roleCategory)}</div>` : ""}
-        ${e.subroles.map(sr => `
-          <div class="subrole-blk">
-            <div class="subrole-h">${esc(sr.title)}</div>
-            <ul>${sr.bullets.map(b => `<li>${esc(b)}</li>`).join("")}</ul>
-          </div>
-        `).join("")}
-      </div>
-    `).join(""));
-  }
-
-  function entriesBlock(title, entries) {
-    if (!entries.length) return "";
-    return `<div class="section-atomic"><h2>${title}</h2>` + entries.map(e => `
-      <div class="blk">
-        ${e.role ? `<div class="role-line">${esc(e.role)}</div>` : ""}
-        ${e.meta ? `<div class="meta-line">${esc(e.meta)}</div>` : ""}
-        ${e.paragraphs.map(p => `<p>${esc(p)}</p>`).join("")}
-        ${e.items.length ? `<ul>${e.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : ""}
-        ${e.links.map(l => `<p><a href="${l.href}">${esc(l.text)}</a></p>`).join("")}
-      </div>
-    `).join("") + `</div>`;
-  }
-
-  sectionsHTML.push(entriesBlock("Education", d.education));
-  sectionsHTML.push(entriesBlock("Training / Short Courses", d.training));
-  sectionsHTML.push(entriesBlock("Certifications", d.certifications));
-  sectionsHTML.push(entriesBlock("Volunteering", d.volunteering));
-
-  if (d.references) sectionsHTML.push(`<div class="section-atomic"><h2>References</h2><p>${esc(d.references)}</p></div>`);
-
-  // Key Achievements & Projects render in the LEFT sidebar column for
-  // PDF/DOC exports specifically (kept in the main column on the live page).
-  const achievementsSideHTML = d.achievements.length ? `
-    <div class="side-block">
-      <div class="side-h">Key Achievements</div>
-      ${d.achievements.map(a => `
-        <div class="side-entry">
-          <div class="side-entry-title">${esc(a.title)}</div>
-          <div class="side-entry-desc">${esc(a.description)}</div>
-        </div>
-      `).join("")}
-    </div>` : "";
-
-  const projectsSideHTML = d.projects.length ? `
-    <div class="side-block">
-      <div class="side-h">Projects</div>
-      ${d.projects.map(p => `
-        <div class="side-entry">
-          ${p.role ? `<div class="side-entry-title">${esc(p.role)}</div>` : ""}
-          ${p.meta ? `<div class="side-entry-meta">${esc(p.meta)}</div>` : ""}
-          ${p.items.length ? `<ul>${p.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : ""}
-        </div>
-      `).join("")}
-    </div>` : "";
-
-  const sidebarHTML = `
-    <div class="side">
-      ${d.photoSrc ? `<img class="photo" src="${d.photoSrc}" crossorigin="anonymous"/>` : ""}
-      <div class="name">${esc(d.name)}</div>
-      <div class="headline">${esc(d.headline)}</div>
-
-      <div class="side-block">
-        <div class="side-h">Contact</div>
-        ${d.contact.map(c => `<div class="side-line">${esc(c)}</div>`).join("")}
-      </div>
-
-      ${d.skillGroups.length ? `
-        <div class="side-block">
-          <div class="side-h">Skills</div>
-          ${d.skillGroups.map(g => `
-            <div class="skill-g"><div class="skill-g-t">${esc(g.title)}</div>
-            <div class="side-line">${esc(g.tags.join(", "))}</div></div>
-          `).join("")}
-        </div>` : ""}
-
-      ${d.languages ? `<div class="side-block"><div class="side-h">Languages</div><div class="side-line">${esc(d.languages)}</div></div>` : ""}
-
-      ${d.interests.length ? `
-        <div class="side-block">
-          <div class="side-h">Interests</div>
-          ${d.interests.map(i => `<div class="side-line"><strong>${esc(i.title)}</strong>${i.sub ? ` — ${esc(i.sub)}` : ""}</div>`).join("")}
-        </div>` : ""}
-
-      ${achievementsSideHTML}
-      ${projectsSideHTML}
-    </div>
-  `;
-
-  return `
-    <table class="cv-table"><tr>
-      <td class="side-cell">${sidebarHTML}</td>
-      <td class="main-cell">${sectionsHTML.join("")}</td>
-    </tr></table>
-  `;
-}
-
-const EXPORT_STYLES = `
-  body { font-family: Arial, Helvetica, sans-serif; color: #111827; font-size: 11pt; margin:0; }
-  .cv-table { width: 100%; border-collapse: collapse; }
-  .side-cell { width: 32%; vertical-align: top; padding: 0 18px 0 0; border-right: 1px solid #d1d5db; }
-  .main-cell { width: 68%; vertical-align: top; padding: 0 0 0 22px; }
-  .photo { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #111827; margin-bottom: 10px; }
-  .name { font-size: 15pt; font-weight: 700; color: #111827; }
-  .headline { font-size: 10pt; font-weight: 600; color: #92702c; margin-bottom: 14px; }
-  .side-block { margin-top: 14px; padding-top: 10px; border-top: 1px solid #e5e7eb; page-break-inside: avoid; mso-pagination: avoid; }
-  .side-h { font-size: 8pt; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #6b7280; margin-bottom: 6px; }
-  .side-line { font-size: 9pt; color: #374151; margin-bottom: 5px; line-height: 1.4; }
-  .skill-g { margin-bottom: 8px; }
-  .skill-g-t { font-size: 8.5pt; font-weight: 700; color: #111827; }
-  .side-entry { margin-bottom: 10px; page-break-inside: avoid; mso-pagination: avoid; }
-  .side-entry:last-child { margin-bottom: 0; }
-  .side-entry-title { font-size: 8.8pt; font-weight: 700; color: #111827; line-height: 1.35; }
-  .side-entry-meta { font-size: 8pt; color: #6b7280; margin-bottom: 2px; }
-  .side-entry-desc { font-size: 8.3pt; color: #374151; line-height: 1.4; }
-  .side-entry ul { margin: 3px 0 0 14px; padding: 0; }
-  .side-entry li { font-size: 8.3pt; color: #374151; margin-bottom: 2px; line-height: 1.4; }
-  h2 { font-size: 12pt; color: #111827; border-bottom: 2px solid #111827; padding-bottom: 5px; margin: 16px 0 10px; page-break-after: avoid; mso-pagination: avoid; }
-  .section-atomic { page-break-inside: avoid; mso-pagination: avoid; }
-  .blk { margin-bottom: 14px; page-break-inside: avoid; mso-pagination: avoid; }
-  .role-line { font-weight: 700; color: #111827; font-size: 10.5pt; }
-  .sub-line { color: #92702c; font-weight: 600; font-size: 9.5pt; }
-  .meta-line { color: #6b7280; font-size: 8.5pt; margin-bottom: 4px; }
-  .italic-line { color: #6b7280; font-style: italic; font-size: 9pt; margin: 3px 0; }
-  .cat-line { font-weight: 700; text-transform: uppercase; font-size: 8.5pt; letter-spacing: 0.5px; margin: 8px 0 3px; }
-  .subrole-blk { margin: 6px 0 6px 0; page-break-inside: avoid; mso-pagination: avoid; }
-  .subrole-h { font-weight: 700; font-size: 9.5pt; color: #111827; }
-  p { font-size: 9.5pt; line-height: 1.5; color: #374151; margin: 4px 0; }
-  ul { margin: 4px 0 4px 18px; padding: 0; }
-  li { font-size: 9.5pt; color: #374151; margin-bottom: 3px; line-height: 1.45; }
-  a { color: #92702c; }
-`;
-
 function setStatus(msg, isError) {
   const el = document.getElementById("downloadStatus");
   if (!el) return;
@@ -232,118 +79,225 @@ function setStatus(msg, isError) {
   el.textContent = msg;
 }
 
-/* ── PDF download ─────────────────────────────────────────── */
-document.getElementById("downloadResumeBtn").addEventListener("click", async () => {
-  const btn = document.getElementById("downloadResumeBtn");
-  btn.disabled = true;
+/* ── PDF: plain, standard, ATS-friendly (real text, single column) ── */
+document.getElementById("downloadResumeBtn").addEventListener("click", () => {
   setStatus("Generating PDF…");
-
-  const data = buildResumeData();
-  const wrapper = document.createElement("div");
-  wrapper.style.position = "fixed";
-  wrapper.style.left = "-9999px";
-  wrapper.style.top = "0";
-  wrapper.style.width = "816px"; // US Letter width at 96dpi
-  wrapper.style.background = "#ffffff";
-  wrapper.style.padding = "10px 12px";
-  wrapper.innerHTML = `<style>${EXPORT_STYLES}</style>` + buildExportHTML(data);
-  document.body.appendChild(wrapper);
-
   try {
-    // Collect the vertical span [top, bottom) of every atomic, "don't
-    // split me" block in BOTH columns (relative to the wrapper) BEFORE
-    // rasterizing. We then merge overlapping/adjacent spans so we know
-    // exactly which Y-ranges are "occupied" — a page break is only ever
-    // allowed to land in the gaps between them, never inside one, in
-    // either column, so a section can never straddle two pages.
-    const SCALE = 2; // must match html2canvas scale below
-    const wrapperRect = wrapper.getBoundingClientRect();
-    const atomicSelectors = ".section-atomic, .blk, .subrole-blk, .side-block, .side-entry";
-    const spans = [];
-    wrapper.querySelectorAll(atomicSelectors).forEach(elm => {
-      const r = elm.getBoundingClientRect();
-      const top = Math.round((r.top - wrapperRect.top) * SCALE);
-      const bottom = Math.round((r.bottom - wrapperRect.top) * SCALE);
-      if (bottom > top) spans.push([top, bottom]);
-    });
-    spans.sort((a, b) => a[0] - b[0]);
-
-    const merged = [];
-    for (const [s, e] of spans) {
-      if (merged.length && s <= merged[merged.length - 1][1]) {
-        merged[merged.length - 1][1] = Math.max(merged[merged.length - 1][1], e);
-      } else {
-        merged.push([s, e]);
-      }
-    }
-
-    const totalHeightPx = Math.round(wrapper.getBoundingClientRect().height * SCALE);
-    // Safe cut points: 0, the end of every merged (occupied) span, and
-    // the very bottom of the document.
-    const sortedBreaks = [0, ...merged.map(m => m[1]), totalHeightPx]
-      .filter((v, i, arr) => arr.indexOf(v) === i)
-      .sort((a, b) => a - b);
-
-    // If a candidate cut still happens to land inside some merged span
-    // (can happen right at totalHeightPx if content ends mid-span due to
-    // rounding), snap it back to that span's start instead.
-    function isInsideAnySpan(y) {
-      return merged.find(([s, e]) => y > s && y < e);
-    }
-
-    const canvas = await html2canvas(wrapper, { scale: SCALE, useCORS: true, backgroundColor: "#ffffff" });
+    const d = buildResumeData();
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: "mm", format: "letter" });
+    const pdf = new jsPDF({ unit: "pt", format: "letter" });
 
-    const pageWidthMm = pdf.internal.pageSize.getWidth();
-    const pageHeightMm = pdf.internal.pageSize.getHeight();
-    const marginMm = 5;
-    const usableWidthMm = pageWidthMm - marginMm * 2;
-    const usableHeightMm = pageHeightMm - marginMm * 2;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 40;
+    const maxWidth = pageWidth - margin * 2;
+    let y = margin;
 
-    const pxToMm = usableWidthMm / canvas.width;
-    const maxSlicePx = Math.floor(usableHeightMm / pxToMm);
-
-    // Walk through the sorted safe-break positions, greedily filling each
-    // page up to (but not exceeding) one page-height, always landing
-    // exactly on a section/block boundary — never mid-section.
-    let cursorPx = 0;
-    let firstPage = true;
-
-    while (cursorPx < totalHeightPx - 1) {
-      const maxAllowed = cursorPx + maxSlicePx;
-      let cut = -1;
-      for (const bp of sortedBreaks) {
-        if (bp > cursorPx && bp <= maxAllowed) cut = bp;
-        if (bp > maxAllowed) break;
+    function checkPageBreak(need) {
+      if (y + need > pageHeight - margin) {
+        pdf.addPage();
+        y = margin;
       }
-      // Fallback: no safe boundary fits on this page at all (a single
-      // section is taller than a full page) — force a break, snapped to
-      // a span start if possible so we at least don't cut mid-line.
-      if (cut === -1) {
-        cut = Math.min(maxAllowed, totalHeightPx);
-        const insideSpan = isInsideAnySpan(cut);
-        if (insideSpan && insideSpan[0] > cursorPx) cut = insideSpan[0];
-      }
+    }
 
-      const sliceHeightPx = cut - cursorPx;
-      if (sliceHeightPx <= 0) { cursorPx = totalHeightPx; break; }
+    function heading(txt) {
+      checkPageBreak(24);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      pdf.setTextColor(17, 24, 39);
+      pdf.text(txt.toUpperCase(), margin, y);
+      y += 4;
+      pdf.setDrawColor(17, 24, 39);
+      pdf.setLineWidth(1);
+      pdf.line(margin, y, margin + maxWidth, y);
+      y += 16;
+    }
 
-      const sliceCanvas = document.createElement("canvas");
-      sliceCanvas.width = canvas.width;
-      sliceCanvas.height = sliceHeightPx;
-      sliceCanvas.getContext("2d").drawImage(
-        canvas, 0, cursorPx, canvas.width, sliceHeightPx,
-        0, 0, canvas.width, sliceHeightPx
-      );
-      const sliceData = sliceCanvas.toDataURL("image/jpeg", 0.95);
-      const sliceHeightMm = sliceHeightPx * pxToMm;
+    function subheading(txt, size = 11) {
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(size);
+      pdf.setTextColor(17, 24, 39);
+      const lines = pdf.splitTextToSize(txt, maxWidth);
+      checkPageBreak(lines.length * 14);
+      lines.forEach(line => { pdf.text(line, margin, y); y += 14; });
+    }
 
-      if (!firstPage) pdf.addPage();
-      pdf.addImage(sliceData, "JPEG", marginMm, marginMm, usableWidthMm, sliceHeightMm);
+    function metaLine(txt) {
+      if (!txt) return;
+      pdf.setFont("helvetica", "italic");
+      pdf.setFontSize(9.5);
+      pdf.setTextColor(107, 114, 128);
+      const lines = pdf.splitTextToSize(txt, maxWidth);
+      checkPageBreak(lines.length * 12);
+      lines.forEach(line => { pdf.text(line, margin, y); y += 12; });
+      y += 2;
+    }
 
-      firstPage = false;
-      cursorPx = cut;
+    function paragraph(txt, size = 10) {
+      if (!txt) return;
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(size);
+      pdf.setTextColor(55, 65, 81);
+      const lines = pdf.splitTextToSize(txt, maxWidth);
+      lines.forEach(line => {
+        checkPageBreak(13);
+        pdf.text(line, margin, y);
+        y += 13;
+      });
+    }
+
+    function bullet(txt) {
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
+      pdf.setTextColor(55, 65, 81);
+      const indent = 14;
+      const lines = pdf.splitTextToSize(txt, maxWidth - indent);
+      lines.forEach((line, i) => {
+        checkPageBreak(13);
+        if (i === 0) pdf.text("\u2022", margin, y);
+        pdf.text(line, margin + indent, y);
+        y += 13;
+      });
+    }
+
+    function spacer(h = 8) { y += h; }
+
+    /* Header */
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(20);
+    pdf.setTextColor(17, 24, 39);
+    pdf.text(d.name || "", margin, y);
+    y += 22;
+
+    if (d.headline) {
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(11);
+      pdf.setTextColor(80, 80, 80);
+      pdf.text(d.headline, margin, y);
+      y += 16;
+    }
+
+    if (d.contact.length) {
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9.5);
+      pdf.setTextColor(80, 80, 80);
+      const contactLine = d.contact.join("   |   ");
+      const lines = pdf.splitTextToSize(contactLine, maxWidth);
+      lines.forEach(line => { pdf.text(line, margin, y); y += 12; });
+    }
+    y += 8;
+    pdf.setDrawColor(180, 180, 180);
+    pdf.setLineWidth(0.75);
+    pdf.line(margin, y, margin + maxWidth, y);
+    y += 18;
+
+    /* Summary */
+    if (d.summary) {
+      heading("Summary");
+      paragraph(d.summary);
+      spacer(14);
+    }
+
+    /* Skills */
+    if (d.skillGroups.length) {
+      heading("Skills");
+      d.skillGroups.forEach(g => {
+        if (!g.tags.length) return;
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(10);
+        pdf.setTextColor(17, 24, 39);
+        checkPageBreak(13);
+        pdf.text(`${g.title}: `, margin, y);
+        const labelWidth = pdf.getTextWidth(`${g.title}: `);
+        pdf.setFont("helvetica", "normal");
+        pdf.setTextColor(55, 65, 81);
+        const lines = pdf.splitTextToSize(g.tags.join(", "), maxWidth - labelWidth);
+        lines.forEach((line, i) => {
+          if (i > 0) checkPageBreak(13);
+          pdf.text(line, margin + (i === 0 ? labelWidth : 0), y);
+          y += 13;
+        });
+      });
+      spacer(6);
+    }
+
+    /* Experience */
+    if (d.experience.length) {
+      heading("Experience");
+      d.experience.forEach(e => {
+        subheading(e.company, 11);
+        subheading(e.role, 10.5);
+        metaLine(e.years);
+        if (e.tagline) paragraph(e.tagline, 9.5);
+        if (e.roleCategory) {
+          spacer(2);
+          subheading(e.roleCategory, 9.5);
+          spacer(2);
+        }
+        e.subroles.forEach(sr => {
+          subheading(sr.title, 10);
+          sr.bullets.forEach(b => bullet(b));
+          spacer(4);
+        });
+        spacer(10);
+      });
+    }
+
+    /* Key Achievements */
+    if (d.achievements.length) {
+      heading("Key Achievements");
+      d.achievements.forEach(a => {
+        subheading(a.title, 10.5);
+        paragraph(a.description, 9.5);
+        spacer(8);
+      });
+    }
+
+    /* Generic entry-based sections */
+    function entriesSection(title, entries) {
+      if (!entries.length) return;
+      heading(title);
+      entries.forEach(e => {
+        if (e.role) subheading(e.role, 10.5);
+        if (e.meta) metaLine(e.meta);
+        e.paragraphs.forEach(p => paragraph(p, 9.5));
+        e.items.forEach(i => bullet(i));
+        e.links.forEach(l => {
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(9.5);
+          pdf.setTextColor(37, 99, 235);
+          checkPageBreak(13);
+          pdf.textWithLink(l.text, margin, y, { url: l.href });
+          y += 13;
+        });
+        spacer(8);
+      });
+    }
+
+    entriesSection("Projects", d.projects);
+    entriesSection("Education", d.education);
+    entriesSection("Training / Short Courses", d.training);
+    entriesSection("Certifications", d.certifications);
+    entriesSection("Volunteering", d.volunteering);
+
+    /* Languages & Interests */
+    if (d.languages) {
+      heading("Languages");
+      paragraph(d.languages);
+      spacer(10);
+    }
+
+    if (d.interests.length) {
+      heading("Interests");
+      d.interests.forEach(i => {
+        paragraph(i.sub ? `${i.title} — ${i.sub}` : i.title, 9.5);
+      });
+      spacer(10);
+    }
+
+    if (d.references) {
+      heading("References");
+      paragraph(d.references);
     }
 
     pdf.save("Resume - Md Rashedul Haque.pdf");
@@ -351,42 +305,125 @@ document.getElementById("downloadResumeBtn").addEventListener("click", async () 
     setTimeout(() => setStatus(""), 3000);
   } catch (err) {
     console.error("PDF generation failed:", err);
-    setStatus("Couldn't generate the PDF — this can happen if the profile photo is hosted somewhere that blocks cross-site image access. Try a different photo host, or remove the photo and try again.", true);
-  } finally {
-    document.body.removeChild(wrapper);
-    btn.disabled = false;
+    setStatus(`Couldn't generate the PDF: ${err.message}`, true);
   }
 });
 
-/* ── DOC download (real, editable, opens in Word/Google Docs) ── */
+/* ── DOC: same content, simple single-column Word document ── */
 document.getElementById("downloadDocBtn").addEventListener("click", () => {
   setStatus("Generating DOC…");
-  const data = buildResumeData();
-  const bodyHTML = `<style>${EXPORT_STYLES}</style>` + buildExportHTML(data);
+  try {
+    const d = buildResumeData();
 
-  const docHTML = `
-    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-    <head><meta charset="utf-8"><title>${esc(data.name)} — Resume</title>
-    <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom>
-    <w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->
-    <style>
-      @page { size: 8.5in 11in; margin: 0.3in; }
-      body { margin: 0; }
-    </style>
-    </head>
-    <body>${bodyHTML}</body></html>
-  `;
+    const parts = [];
+    parts.push(`<h1>${esc(d.name)}</h1>`);
+    if (d.headline) parts.push(`<p class="headline">${esc(d.headline)}</p>`);
+    if (d.contact.length) parts.push(`<p class="contact">${d.contact.map(esc).join(" &nbsp;|&nbsp; ")}</p>`);
+    parts.push(`<hr/>`);
 
-  const blob = new Blob(["\ufeff", docHTML], { type: "application/msword" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "Resume - Md Rashedul Haque.doc";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+    if (d.summary) parts.push(`<h2>Summary</h2><p>${esc(d.summary)}</p>`);
 
-  setStatus("DOC downloaded.");
-  setTimeout(() => setStatus(""), 3000);
+    if (d.skillGroups.length) {
+      parts.push(`<h2>Skills</h2>`);
+      d.skillGroups.forEach(g => {
+        if (!g.tags.length) return;
+        parts.push(`<p><strong>${esc(g.title)}:</strong> ${esc(g.tags.join(", "))}</p>`);
+      });
+    }
+
+    if (d.experience.length) {
+      parts.push(`<h2>Experience</h2>`);
+      d.experience.forEach(e => {
+        parts.push(`<p class="role-line">${esc(e.company)}</p>`);
+        parts.push(`<p class="sub-line">${esc(e.role)}</p>`);
+        if (e.years) parts.push(`<p class="meta-line">${esc(e.years)}</p>`);
+        if (e.tagline) parts.push(`<p class="italic-line">${esc(e.tagline)}</p>`);
+        if (e.roleCategory) parts.push(`<p class="cat-line">${esc(e.roleCategory)}</p>`);
+        e.subroles.forEach(sr => {
+          parts.push(`<p class="subrole-h">${esc(sr.title)}</p>`);
+          if (sr.bullets.length) parts.push(`<ul>${sr.bullets.map(b => `<li>${esc(b)}</li>`).join("")}</ul>`);
+        });
+      });
+    }
+
+    if (d.achievements.length) {
+      parts.push(`<h2>Key Achievements</h2>`);
+      d.achievements.forEach(a => {
+        parts.push(`<p class="role-line">${esc(a.title)}</p><p>${esc(a.description)}</p>`);
+      });
+    }
+
+    function entriesSection(title, entries) {
+      if (!entries.length) return;
+      parts.push(`<h2>${title}</h2>`);
+      entries.forEach(e => {
+        if (e.role) parts.push(`<p class="role-line">${esc(e.role)}</p>`);
+        if (e.meta) parts.push(`<p class="meta-line">${esc(e.meta)}</p>`);
+        e.paragraphs.forEach(p => parts.push(`<p>${esc(p)}</p>`));
+        if (e.items.length) parts.push(`<ul>${e.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>`);
+        e.links.forEach(l => parts.push(`<p><a href="${l.href}">${esc(l.text)}</a></p>`));
+      });
+    }
+
+    entriesSection("Projects", d.projects);
+    entriesSection("Education", d.education);
+    entriesSection("Training / Short Courses", d.training);
+    entriesSection("Certifications", d.certifications);
+    entriesSection("Volunteering", d.volunteering);
+
+    if (d.languages) parts.push(`<h2>Languages</h2><p>${esc(d.languages)}</p>`);
+
+    if (d.interests.length) {
+      parts.push(`<h2>Interests</h2>`);
+      d.interests.forEach(i => parts.push(`<p>${esc(i.title)}${i.sub ? ` — ${esc(i.sub)}` : ""}</p>`));
+    }
+
+    if (d.references) parts.push(`<h2>References</h2><p>${esc(d.references)}</p>`);
+
+    const styles = `
+      body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; color: #111827; }
+      h1 { font-size: 20pt; margin: 0 0 4px; }
+      .headline { color: #555; font-size: 11pt; margin: 0 0 6px; }
+      .contact { color: #555; font-size: 9.5pt; margin: 0 0 10px; }
+      hr { border: none; border-top: 1px solid #bbb; margin: 10px 0 16px; }
+      h2 { font-size: 13pt; border-bottom: 1.5px solid #111827; padding-bottom: 4px; margin: 18px 0 10px; page-break-after: avoid; mso-pagination: avoid; }
+      p { font-size: 10pt; line-height: 1.5; margin: 4px 0; }
+      .role-line { font-weight: 700; font-size: 11pt; margin: 10px 0 0; }
+      .sub-line { color: #92702c; font-weight: 600; font-size: 10pt; margin: 0; }
+      .meta-line { color: #666; font-size: 9pt; font-style: italic; margin: 0 0 4px; }
+      .italic-line { color: #666; font-style: italic; font-size: 9.5pt; }
+      .cat-line { font-weight: 700; text-transform: uppercase; font-size: 9pt; letter-spacing: 0.5px; margin: 8px 0 2px; }
+      .subrole-h { font-weight: 700; font-size: 10pt; margin: 6px 0 2px; }
+      ul { margin: 4px 0 8px 20px; padding: 0; }
+      li { font-size: 10pt; margin-bottom: 3px; line-height: 1.4; }
+      a { color: #2563eb; }
+      @page { size: 8.5in 11in; margin: 0.6in; }
+    `;
+
+    const docHTML = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><meta charset="utf-8"><title>${esc(d.name)} — Resume</title>
+      <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom>
+      <w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->
+      <style>${styles}</style>
+      </head>
+      <body>${parts.join("")}</body></html>
+    `;
+
+    const blob = new Blob(["\ufeff", docHTML], { type: "application/msword" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Resume - Md Rashedul Haque.doc";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setStatus("DOC downloaded.");
+    setTimeout(() => setStatus(""), 3000);
+  } catch (err) {
+    console.error("DOC generation failed:", err);
+    setStatus(`Couldn't generate the DOC: ${err.message}`, true);
+  }
 });
