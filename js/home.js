@@ -89,6 +89,26 @@ const DEFAULT_EXPERIENCE = [
     if (!snap.empty) skills = snap.docs.map(d => d.data());
   } catch (err) { /* keep defaults */ }
 
+  // Color scale: red (low) -> amber -> teal -> green (high), driven by
+  // each skill's own percentage rather than one flat color for all bars.
+  function skillColor(pct) {
+    const p = Math.max(0, Math.min(100, pct || 0));
+    const stops = [
+      { at: 0,   color: [220, 38, 38]  },  // red
+      { at: 50,  color: [245, 158, 11] },  // amber
+      { at: 75,  color: [20, 184, 166] },  // teal
+      { at: 100, color: [0, 184, 123]  }   // brand green
+    ];
+    let lo = stops[0], hi = stops[stops.length - 1];
+    for (let i = 0; i < stops.length - 1; i++) {
+      if (p >= stops[i].at && p <= stops[i + 1].at) { lo = stops[i]; hi = stops[i + 1]; break; }
+    }
+    const range = hi.at - lo.at || 1;
+    const t = (p - lo.at) / range;
+    const rgb = lo.color.map((c, i) => Math.round(c + (hi.color[i] - c) * t));
+    return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+  }
+
   const half = Math.ceil(skills.length / 2);
   const cols = [skills.slice(0, half), skills.slice(half)];
   container.innerHTML = cols.map(col => `
@@ -100,7 +120,7 @@ const DEFAULT_EXPERIENCE = [
             <p class="mb-2">${s.percentage || 0}%</p>
           </div>
           <div class="progress">
-            <div class="progress-bar bg-primary" role="progressbar" style="width:${s.percentage || 0}%" aria-valuenow="${s.percentage || 0}" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="progress-bar" role="progressbar" style="width:${s.percentage || 0}%; background-color:${skillColor(s.percentage)};" aria-valuenow="${s.percentage || 0}" aria-valuemin="0" aria-valuemax="100"></div>
           </div>
         </div>
       `).join("")}
@@ -190,5 +210,3 @@ const DEFAULT_SERVICES = [
     console.error("Failed to load portfolio:", err);
   }
 })();
-
-
