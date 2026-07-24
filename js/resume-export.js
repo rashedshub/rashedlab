@@ -242,9 +242,9 @@ document.getElementById("downloadResumeBtn").addEventListener("click", async () 
   wrapper.style.position = "fixed";
   wrapper.style.left = "-9999px";
   wrapper.style.top = "0";
-  wrapper.style.width = "794px"; // A4 width at 96dpi
+  wrapper.style.width = "816px"; // US Letter width at 96dpi
   wrapper.style.background = "#ffffff";
-  wrapper.style.padding = "36px 40px";
+  wrapper.style.padding = "10px 12px";
   wrapper.innerHTML = `<style>${EXPORT_STYLES}</style>` + buildExportHTML(data);
   document.body.appendChild(wrapper);
 
@@ -292,11 +292,11 @@ document.getElementById("downloadResumeBtn").addEventListener("click", async () 
 
     const canvas = await html2canvas(wrapper, { scale: SCALE, useCORS: true, backgroundColor: "#ffffff" });
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: "mm", format: "a4" });
+    const pdf = new jsPDF({ unit: "mm", format: "letter" });
 
     const pageWidthMm = pdf.internal.pageSize.getWidth();
     const pageHeightMm = pdf.internal.pageSize.getHeight();
-    const marginMm = 10;
+    const marginMm = 5;
     const usableWidthMm = pageWidthMm - marginMm * 2;
     const usableHeightMm = pageHeightMm - marginMm * 2;
 
@@ -368,6 +368,10 @@ document.getElementById("downloadDocBtn").addEventListener("click", () => {
     <head><meta charset="utf-8"><title>${esc(data.name)} — Resume</title>
     <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom>
     <w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->
+    <style>
+      @page { size: 8.5in 11in; margin: 0.3in; }
+      body { margin: 0; }
+    </style>
     </head>
     <body>${bodyHTML}</body></html>
   `;
