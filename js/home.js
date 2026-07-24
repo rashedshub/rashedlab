@@ -89,16 +89,20 @@ const DEFAULT_EXPERIENCE = [
     if (!snap.empty) skills = snap.docs.map(d => d.data());
   } catch (err) { /* keep defaults */ }
 
-  // Color scale: red (low) -> amber -> teal -> green (high), driven by
-  // each skill's own percentage rather than one flat color for all bars.
+  // Color scale: red (~50-60%, low) -> amber -> teal -> green (90-100%,
+  // high), calibrated to a realistic skill-rating range rather than 0-100,
+  // so scores actually spread across the full color range instead of
+  // clustering all-green.
   function skillColor(pct) {
     const p = Math.max(0, Math.min(100, pct || 0));
     const stops = [
-      { at: 0,   color: [220, 38, 38]  },  // red
-      { at: 50,  color: [245, 158, 11] },  // amber
-      { at: 75,  color: [20, 184, 166] },  // teal
-      { at: 100, color: [0, 184, 123]  }   // brand green
+      { at: 50,  color: [220, 38, 38]  },  // red
+      { at: 65,  color: [245, 158, 11] },  // amber
+      { at: 80,  color: [20, 184, 166] },  // teal
+      { at: 90,  color: [0, 184, 123]  }   // brand green
     ];
+    if (p <= stops[0].at) return `rgb(${stops[0].color.join(", ")})`;
+    if (p >= stops[stops.length - 1].at) return `rgb(${stops[stops.length - 1].color.join(", ")})`;
     let lo = stops[0], hi = stops[stops.length - 1];
     for (let i = 0; i < stops.length - 1; i++) {
       if (p >= stops[i].at && p <= stops[i + 1].at) { lo = stops[i]; hi = stops[i + 1]; break; }
@@ -210,3 +214,5 @@ const DEFAULT_SERVICES = [
     console.error("Failed to load portfolio:", err);
   }
 })();
+
+
