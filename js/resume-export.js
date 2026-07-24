@@ -105,7 +105,7 @@ function buildExportHTML(d) {
 
   function entriesBlock(title, entries) {
     if (!entries.length) return "";
-    return `<h2>${title}</h2>` + entries.map(e => `
+    return `<div class="section-atomic"><h2>${title}</h2>` + entries.map(e => `
       <div class="blk">
         ${e.role ? `<div class="role-line">${esc(e.role)}</div>` : ""}
         ${e.meta ? `<div class="meta-line">${esc(e.meta)}</div>` : ""}
@@ -113,7 +113,7 @@ function buildExportHTML(d) {
         ${e.items.length ? `<ul>${e.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : ""}
         ${e.links.map(l => `<p><a href="${l.href}">${esc(l.text)}</a></p>`).join("")}
       </div>
-    `).join("");
+    `).join("") + `</div>`;
   }
 
   sectionsHTML.push(entriesBlock("Education", d.education));
@@ -121,7 +121,7 @@ function buildExportHTML(d) {
   sectionsHTML.push(entriesBlock("Certifications", d.certifications));
   sectionsHTML.push(entriesBlock("Volunteering", d.volunteering));
 
-  if (d.references) sectionsHTML.push(`<h2>References</h2><p>${esc(d.references)}</p>`);
+  if (d.references) sectionsHTML.push(`<div class="section-atomic"><h2>References</h2><p>${esc(d.references)}</p></div>`);
 
   // Key Achievements & Projects render in the LEFT sidebar column for
   // PDF/DOC exports specifically (kept in the main column on the live page).
@@ -210,6 +210,7 @@ const EXPORT_STYLES = `
   .side-entry ul { margin: 3px 0 0 14px; padding: 0; }
   .side-entry li { font-size: 8.3pt; color: #374151; margin-bottom: 2px; line-height: 1.4; }
   h2 { font-size: 12pt; color: #111827; border-bottom: 2px solid #111827; padding-bottom: 5px; margin: 16px 0 10px; page-break-after: avoid; mso-pagination: avoid; }
+  .section-atomic { page-break-inside: avoid; mso-pagination: avoid; }
   .blk { margin-bottom: 14px; page-break-inside: avoid; mso-pagination: avoid; }
   .role-line { font-weight: 700; color: #111827; font-size: 10.5pt; }
   .sub-line { color: #92702c; font-weight: 600; font-size: 9.5pt; }
@@ -257,7 +258,7 @@ document.getElementById("downloadResumeBtn").addEventListener("click", async () 
     // either column, so a section can never straddle two pages.
     const SCALE = 2; // must match html2canvas scale below
     const wrapperRect = wrapper.getBoundingClientRect();
-    const atomicSelectors = ".blk, .subrole-blk, .side-block, .side-entry";
+    const atomicSelectors = ".section-atomic, .blk, .subrole-blk, .side-block, .side-entry";
     const spans = [];
     wrapper.querySelectorAll(atomicSelectors).forEach(elm => {
       const r = elm.getBoundingClientRect();
