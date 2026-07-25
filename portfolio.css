@@ -861,6 +861,17 @@ form button:hover { background: var(--ink-2); }
 .post-wrap { max-width: 700px; margin: 0 auto; padding: 64px 40px 88px; }
 .post-wrap h1 { color: var(--ink); }
 .comment { border-top: 1px solid var(--border); padding: 16px 0; }
+.comment-delete-btn {
+  margin-top: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 4px 12px;
+  border-radius: 3px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.comment-delete-btn:hover { border-color: #dc2626; color: #dc2626; }
 .comment .meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 4px; }
 
 /* ── Admin editor ────────────────────────────────────────── */

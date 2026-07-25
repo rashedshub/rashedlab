@@ -1,7 +1,7 @@
 import { app } from "./firebase.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 import {
-  getFirestore, doc, getDoc,
+  getFirestore, doc, getDoc, deleteDoc,
   collection, addDoc, getDocs, query, where, orderBy
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
@@ -10,11 +10,13 @@ const db = getFirestore(app);
 const params = new URLSearchParams(window.location.search);
 const postId = params.get("id");
 
+let currentUser = null;
+let isAdmin = false;
+
 if (!postId) {
   document.getElementById("postTitle").textContent = "Post not found";
 } else {
   loadPost();
-  loadComments();
 }
 
 async function loadPost() {
@@ -36,26 +38,75 @@ async function loadPost() {
   document.getElementById("postDate").textContent = `By Md. Rashedul Haque${dateStr ? ` · ${dateStr}` : ""}`;
 }
 
+/* Comments are rendered using textContent (never innerHTML) for any
+   field a visitor supplied — comment text, display name — so a
+   malicious comment can never inject executable markup. */
 async function loadComments() {
   const list = document.getElementById("commentList");
   const q = query(collection(db, "comments"), where("postId", "==", postId), orderBy("createdAt", "asc"));
   const snap = await getDocs(q);
   list.innerHTML = "";
+
   if (snap.empty) {
-    list.innerHTML = "<p style='color:var(--muted);'>No comments yet.</p>";
+    const empty = document.createElement("p");
+    empty.style.color = "var(--muted)";
+    empty.textContent = "No comments yet.";
+    list.appendChild(empty);
     return;
   }
+
   snap.forEach(d => {
     const c = d.data();
-    const div = document.createElement("div");
-    div.className = "comment";
-    div.innerHTML = `<div class="meta">${c.userName || "Anonymous"} &middot; ${new Date(c.createdAt).toLocaleDateString()}</div>
-      <div>${c.text || ""}</div>`;
-    list.appendChild(div);
+
+    const wrap = document.createElement("div");
+    wrap.className = "comment";
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = `${c.userName || "Anonymous"} · ${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : ""}`;
+
+    const body = document.createElement("div");
+    body.textContent = c.text || "";
+
+    wrap.appendChild(meta);
+    wrap.appendChild(body);
+
+    // Moderation: the comment's own author, or the site admin, can remove it
+    if (currentUser && (currentUser.uid === c.userId || isAdmin)) {
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.textContent = "Delete";
+      delBtn.className = "comment-delete-btn";
+      delBtn.addEventListener("click", async () => {
+        if (!confirm("Delete this comment?")) return;
+        try {
+          await deleteDoc(doc(db, "comments", d.id));
+          loadComments();
+        } catch (err) {
+          console.error("Failed to delete comment:", err);
+          alert("Couldn't delete that comment. Please try again.");
+        }
+      });
+      wrap.appendChild(delBtn);
+    }
+
+    list.appendChild(wrap);
   });
 }
 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  isAdmin = false;
+
+  if (user) {
+    try {
+      const userSnap = await getDoc(doc(db, "users", user.uid));
+      isAdmin = userSnap.exists() && userSnap.data().role === "admin";
+    } catch (err) { /* not admin */ }
+  }
+
+  loadComments();
+
   const formArea = document.getElementById("commentForm");
   if (!user) {
     formArea.innerHTML = `<p><a href="login.html">Log in</a> to leave a comment.</p>`;
