@@ -122,6 +122,7 @@
       <a href="projects.html" data-target="projects" data-page="projects.html">Projects</a>
       <a href="resume.html" data-target="resume" data-page="resume.html">Resume</a>
       <a href="blog.html" data-target="blog" data-page="blog.html">Blog</a>
+      <a href="gallery.html" data-target="gallery" data-page="gallery.html">Gallery</a>
       <span class="mainnav-divider"></span>
       <a href="admin-login.html" data-target="admin-login.html" data-page="admin-login.html">Admin</a>
       <span class="mainnav-divider"></span>
@@ -147,6 +148,7 @@
     <button data-panel="projects">Projects</button>
     <button data-panel="blog">Blog</button>
     <button data-panel="messages">Messages</button>
+    <button data-panel="gallery">Gallery</button>
   </div>
 
   <!-- ABOUT ME -->
@@ -347,6 +349,30 @@
     <div id="messageList"></div>
   </div>
 
+  <!-- GALLERY -->
+  <div class="panel" id="panel-gallery">
+    <div class="panel-card">
+      <h3>Add / Edit Photo</h3>
+      <input type="hidden" id="galId"/>
+      <label>Upload an image file</label>
+      <input type="file" id="galFile" accept="image/*" class="form-control"/>
+      <button class="btn-save" id="galUploadBtn" type="button" style="margin-top:10px;">Upload &amp; Use This File</button>
+      <p style="color:rgba(242,242,242,0.45);font-size:0.78rem;margin:10px 0 4px;">— or —</p>
+      <label>Paste an image link (Imgur, another host, etc.)</label>
+      <input type="text" class="form-control" id="galUrl" placeholder="https://example.com/photo.jpg"/>
+      <img id="galPreview" src="" alt="" style="display:none;max-width:180px;margin-top:10px;border:1px solid rgba(255,255,255,0.15);border-radius:6px;"/>
+      <label>Caption (optional)</label>
+      <input type="text" class="form-control" id="galCaption" placeholder="Youngone Leadership Development Program, July 2025"/>
+      <label>Order (lower shows first)</label>
+      <input type="number" class="form-control" id="galOrder" style="max-width:120px;"/>
+      <button class="btn-save" id="saveGal">Save Photo</button>
+      <button class="btn-clear" id="clearGalForm" type="button">Clear / New</button>
+      <p class="save-msg" id="galMsg"></p>
+    </div>
+    <h3 style="color:#fff;">Existing Photos</h3>
+    <div id="galList"></div>
+  </div>
+
   <!-- RESUME INFO -->
   <div class="panel" id="panel-resumeinfo">
     <p style="color:rgba(242,242,242,0.6);">These fields power the Resume page header, Summary, Skills groups, Interests, Languages, Volunteering, and References. Separate from the Home page's About Me.</p>
@@ -359,7 +385,7 @@
         <div><label>Email</label><input type="email" class="form-control" id="rfEmail"/></div>
         <div><label>Phone</label><input type="text" class="form-control" id="rfPhone"/></div>
         <div><label>Website / Portfolio Link</label><input type="text" class="form-control" id="rfWebsite"/></div>
-        <div style="grid-column:1/-1;"><label>Birthday (optional)</label><input type="text" class="form-control" id="rfBirthday" placeholder="07 May 1989 (Age 37)"/></div>
+        <div style="grid-column:1/-1;"><label>Birth Date (optional — age is calculated automatically wherever it's shown)</label><input type="date" class="form-control" id="rfBirthDate"/></div>
       </div>
     </div>
     <div class="panel-card">

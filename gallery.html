@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sign Up — Md. Rashedul Haque</title>
+<title>Gallery — Md. Rashedul Haque</title>
+<meta name="description" content="Activity photos and moments from Md. Rashedul Haque's professional journey at Youngone Corporation.">
 <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="portfolio.css"/>
 <link rel="stylesheet" href="css/mainnav.css"/>
+<link rel="stylesheet" href="css/gallery.css"/>
 </head>
 <body>
   <nav class="mainnav" id="mainnav">
@@ -39,20 +41,31 @@
     </div>
   </div>
 </nav>
-<section class="page-section" style="max-width:400px;">
-    <h1>Create Account</h1>
-    <form id="signupForm">
-      <input type="text" id="name" placeholder="Your name" required/>
-      <input type="email" id="email" placeholder="Email" required/>
-      <input type="password" id="password" placeholder="Password (6+ characters)" required minlength="6"/>
-      <button type="submit">Sign Up</button>
-    </form>
-    <p id="signupMsg"></p>
-    <p>Already have an account? <a href="login.html">Log in</a></p>
-    <p><a href="index.html">&larr; Back to site</a></p>
-  </section>
-  <script type="module" src="js/signup.js"></script>
+
+<div class="gal-theme">
+  <header class="gal-header">
+    <h1>Gallery</h1>
+    <p>Moments from trainings, events, and milestones along the way.</p>
+  </header>
+  <div class="gal-grid" id="galleryGrid">
+    <p class="gal-empty">Loading gallery…</p>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="gal-lightbox" id="galLightbox">
+  <button class="gal-lightbox-close" id="galClose" aria-label="Close">&times;</button>
+  <button class="gal-lightbox-prev" id="galPrev" aria-label="Previous">&#8249;</button>
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <img id="galLightboxImg" src="" alt=""/>
+    <p class="gal-lightbox-caption" id="galLightboxCaption"></p>
+  </div>
+  <button class="gal-lightbox-next" id="galNext" aria-label="Next">&#8250;</button>
+</div>
+
+<footer class="site-footer"><p>&copy; 2026 Md. Rashedul Haque.</p></footer>
 <script type="module" src="js/auth-nav.js"></script>
+<script type="module" src="js/gallery.js"></script>
 <script src="js/mainnav.js"></script>
 </body>
 </html>

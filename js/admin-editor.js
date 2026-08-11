@@ -36,6 +36,7 @@ onAuthStateChanged(auth, async (user) => {
   loadPosts();
   loadMessages();
   loadServices();
+  loadGallery();
 });
 
 el("logoutBtn").addEventListener("click", () => signOut(auth).then(() => window.location.href = "admin-login.html"));
@@ -567,7 +568,7 @@ async function loadResumeInfo() {
   el("rfEmail").value = d.email || "";
   el("rfPhone").value = d.phone || "";
   el("rfWebsite").value = d.website || "";
-  el("rfBirthday").value = d.birthday || "";
+  el("rfBirthDate").value = d.birthDate || "";
   el("rfSummary").value = d.summary || "";
   el("rfSkillsHR").value = d.skillsHR || "";
   el("rfSkillsTechnical").value = d.skillsTechnical || "";
@@ -587,7 +588,7 @@ el("saveResumeInfo").addEventListener("click", async () => {
     email: el("rfEmail").value,
     phone: el("rfPhone").value,
     website: el("rfWebsite").value,
-    birthday: el("rfBirthday").value,
+    birthDate: el("rfBirthDate").value,
     summary: el("rfSummary").value,
     skillsHR: el("rfSkillsHR").value,
     skillsTechnical: el("rfSkillsTechnical").value,
@@ -779,4 +780,132 @@ const loadCertifications = makeListCrud({
     { id: "certOrder", key: "order", type: "number" }
   ],
   renderRow: d => `<strong>${d.title || ""}</strong><p>${d.org || ""} ${d.date ? `· ${d.date}` : ""}</p>`
+});
+
+// ── Gallery ─────────────────────────────────────────────────
+function clearGalForm() {
+  el("galId").value = "";
+  el("galFile").value = "";
+  el("galUrl").value = "";
+  el("galCaption").value = "";
+  el("galOrder").value = "";
+  el("galPreview").style.display = "none";
+  el("galPreview").src = "";
+}
+el("clearGalForm").addEventListener("click", clearGalForm);
+
+el("galFile").addEventListener("change", () => {
+  const file = el("galFile").files[0];
+  if (!file) return;
+  el("galPreview").src = URL.createObjectURL(file);
+  el("galPreview").style.display = "block";
+});
+
+el("galUrl").addEventListener("input", () => {
+  const url = el("galUrl").value.trim();
+  if (url) {
+    el("galPreview").src = url;
+    el("galPreview").style.display = "block";
+  }
+});
+
+el("galUploadBtn").addEventListener("click", async () => {
+  const file = el("galFile").files[0];
+  if (!file) {
+    el("galMsg").style.color = "#ff8080";
+    el("galMsg").textContent = "Choose an image file first.";
+    return;
+  }
+  if (!file.type.startsWith("image/")) {
+    el("galMsg").style.color = "#ff8080";
+    el("galMsg").textContent = "Please choose an image file.";
+    return;
+  }
+  el("galMsg").style.color = "";
+  el("galMsg").textContent = "Uploading…";
+  try {
+    const fileRef = ref(storage, `gallery/photo-${Date.now()}.${file.name.split('.').pop()}`);
+    await uploadBytes(fileRef, file);
+    const url = await getDownloadURL(fileRef);
+    el("galUrl").value = url;
+    el("galPreview").src = url;
+    el("galPreview").style.display = "block";
+    el("galMsg").textContent = "Uploaded — now click \"Save Photo\" to add it to the gallery.";
+  } catch (err) {
+    console.error("Failed to upload gallery photo:", err);
+    el("galMsg").style.color = "#ff8080";
+    el("galMsg").textContent = err.code === "storage/unauthorized"
+      ? "Upload failed — permission denied. Check your Firebase Storage rules."
+      : `Upload failed: ${err.message}`;
+  }
+});
+
+async function loadGallery() {
+  const snap = await getDocs(query(collection(db, "gallery"), orderBy("order", "asc")));
+  const list = el("galList");
+  list.innerHTML = "";
+  if (snap.empty) { list.innerHTML = "<p style='color:rgba(242,242,242,0.6);'>No photos yet.</p>"; return; }
+  snap.forEach(d => {
+    const g = d.data();
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.innerHTML = `
+      <div style="display:flex;gap:12px;align-items:center;">
+        <img src="${g.imageUrl}" alt="" style="width:70px;height:52px;object-fit:cover;border-radius:4px;border:1px solid rgba(255,255,255,0.15);"/>
+        <div style="flex:1;">
+          <strong>${g.caption || "(no caption)"}</strong>
+          <div>
+            <button data-edit="${d.id}">Edit</button>
+            <button data-delete="${d.id}">Delete</button>
+          </div>
+        </div>
+      </div>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", async () => {
+    const s = await getDoc(doc(db, "gallery", b.dataset.edit));
+    const g = s.data();
+    el("galId").value = b.dataset.edit;
+    el("galUrl").value = g.imageUrl || "";
+    el("galCaption").value = g.caption || "";
+    el("galOrder").value = g.order ?? "";
+    if (g.imageUrl) { el("galPreview").src = g.imageUrl; el("galPreview").style.display = "block"; }
+  }));
+  list.querySelectorAll("[data-delete]").forEach(b => b.addEventListener("click", async () => {
+    if (!confirm("Delete this photo?")) return;
+    await deleteDoc(doc(db, "gallery", b.dataset.delete));
+    loadGallery();
+  }));
+}
+
+el("saveGal").addEventListener("click", async () => {
+  const imageUrl = el("galUrl").value.trim();
+  if (!imageUrl) {
+    el("galMsg").style.color = "#ff8080";
+    el("galMsg").textContent = "Upload a file or paste an image link first.";
+    return;
+  }
+  const data = {
+    imageUrl,
+    caption: el("galCaption").value,
+    order: Number(el("galOrder").value) || 0
+  };
+  const id = el("galId").value;
+  el("galMsg").style.color = "";
+  el("galMsg").textContent = "Saving…";
+  try {
+    if (id) {
+      await updateDoc(doc(db, "gallery", id), data);
+    } else {
+      await addDoc(collection(db, "gallery"), data);
+    }
+    el("galMsg").textContent = "Saved.";
+    setTimeout(() => el("galMsg").textContent = "", 2500);
+    clearGalForm();
+    loadGallery();
+  } catch (err) {
+    console.error("Failed to save gallery photo:", err);
+    el("galMsg").style.color = "#ff8080";
+    el("galMsg").textContent = `Save failed: ${err.message}`;
+  }
 });

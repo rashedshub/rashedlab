@@ -4,6 +4,21 @@ import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy } from "
 const db = getFirestore(app);
 const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
 
+function formatBirthWithAge(isoDate) {
+  if (!isoDate) return "";
+  const birth = new Date(isoDate + "T00:00:00");
+  if (isNaN(birth.getTime())) return "";
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const hasHadBirthdayThisYear =
+    today.getMonth() > birth.getMonth() ||
+    (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate());
+  if (!hasHadBirthdayThisYear) age--;
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const formatted = `${String(birth.getDate()).padStart(2, "0")} ${months[birth.getMonth()]} ${birth.getFullYear()}`;
+  return `${formatted} (Age ${age})`;
+}
+
 /* ── Defaults, seeded from the uploaded CV (v4) ─────────────── */
 const DEFAULT_HEADER = {
   name: "Md. Rashedul Haque",
@@ -12,7 +27,7 @@ const DEFAULT_HEADER = {
   email: "mail.rashedulhaque@gmail.com",
   phone: "(+880) 1622 702 800",
   website: "https://bit.ly/rashedul_haque",
-  birthday: "07 May 1989 (Age 37)",
+  birthDate: "1989-05-07",
   summary: "Results-driven HR professional with 9+ years of experience in HR operations, data analytics, and strategic business partnering. Currently working as an HR Business Partner at Youngone Hi-Tech, supporting leadership in aligning people strategies, strengthening employee engagement, and building a high-performance culture. Skilled in payroll management, L&D, talent acquisition, policy development, HR process automation, and performance management. Passionate about using data and technology to drive smarter HR decisions, including HRMS development and analytical dashboards.",
   skillsHR: "Payroll Management, Training & Development, HR Automation, Policy Development, Project Management, Compliance Management",
   skillsTechnical: "Word, Excel, PowerPoint, Power BI, HRMS Proficiency, SQL, Python",
@@ -134,7 +149,7 @@ const DEFAULT_CERTS = [
       d.email ? { icon: icons.email, html: `<a href="mailto:${d.email}">${d.email}</a>` } : null,
       d.phone ? { icon: icons.phone, html: d.phone } : null,
       d.website ? { icon: icons.website, html: `<a href="${d.website}" target="_blank" rel="noopener">${d.website.replace(/^https?:\/\//, "")}</a>` } : null,
-      d.birthday ? { icon: icons.calendar, html: d.birthday } : null
+      d.birthDate ? { icon: icons.calendar, html: formatBirthWithAge(d.birthDate) } : null
     ].filter(Boolean);
     contactEl.innerHTML = rows.map(r => `<li>${r.icon}<span>${r.html}</span></li>`).join("");
   }
