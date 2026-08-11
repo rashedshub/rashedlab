@@ -59,7 +59,7 @@ async function loadAbout() {
   el("aboutName").value = d.name || "";
   el("aboutLocation").value = d.location || "";
   el("aboutDegree").value = d.degree || "";
-  el("aboutExperienceYears").value = d.experienceYears || "";
+  el("aboutCareerStart").value = d.careerStartDate || "";
   el("aboutPhone").value = d.phone || "";
   el("aboutEmail").value = d.email || "";
   el("aboutAvailability").value = d.availability || "";
@@ -150,7 +150,7 @@ el("saveAbout").addEventListener("click", async () => {
       name: el("aboutName").value,
       location: el("aboutLocation").value,
       degree: el("aboutDegree").value,
-      experienceYears: el("aboutExperienceYears").value,
+      careerStartDate: el("aboutCareerStart").value,
       phone: el("aboutPhone").value,
       email: el("aboutEmail").value,
       availability: el("aboutAvailability").value,

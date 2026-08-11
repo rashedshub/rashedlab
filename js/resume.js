@@ -19,6 +19,19 @@ function formatBirthWithAge(isoDate) {
   return `${formatted} (Age ${age})`;
 }
 
+function calculateYearsOfExperience(isoDate) {
+  if (!isoDate) return null;
+  const start = new Date(isoDate + "T00:00:00");
+  if (isNaN(start.getTime())) return null;
+  const today = new Date();
+  let years = today.getFullYear() - start.getFullYear();
+  const hasPassedAnniversary =
+    today.getMonth() > start.getMonth() ||
+    (today.getMonth() === start.getMonth() && today.getDate() >= start.getDate());
+  if (!hasPassedAnniversary) years--;
+  return Math.max(0, years);
+}
+
 /* ── Defaults, seeded from the uploaded CV (v4) ─────────────── */
 const DEFAULT_HEADER = {
   name: "Md. Rashedul Haque",
@@ -28,7 +41,7 @@ const DEFAULT_HEADER = {
   phone: "(+880) 1622 702 800",
   website: "https://bit.ly/rashedul_haque",
   birthDate: "1989-05-07",
-  summary: "Results-driven HR professional with 9+ years of experience in HR operations, data analytics, and strategic business partnering. Currently working as an HR Business Partner at Youngone Hi-Tech, supporting leadership in aligning people strategies, strengthening employee engagement, and building a high-performance culture. Skilled in payroll management, L&D, talent acquisition, policy development, HR process automation, and performance management. Passionate about using data and technology to drive smarter HR decisions, including HRMS development and analytical dashboards.",
+  summary: "Results-driven HR professional with {experienceYears}+ years of experience in HR operations, data analytics, and strategic business partnering. Currently working as an HR Business Partner at Youngone Hi-Tech, supporting leadership in aligning people strategies, strengthening employee engagement, and building a high-performance culture. Skilled in payroll management, L&D, talent acquisition, policy development, HR process automation, and performance management. Passionate about using data and technology to drive smarter HR decisions, including HRMS development and analytical dashboards.",
   skillsHR: "Payroll Management, Training & Development, HR Automation, Policy Development, Project Management, Compliance Management",
   skillsTechnical: "Word, Excel, PowerPoint, Power BI, HRMS Proficiency, SQL, Python",
   skillsLeadership: "Problem Solving, Decision Making, Time Management, Emotional Intelligence, Project Management, Eisenhower Matrix, Pareto Principle (80/20 Rule), SMART Goals, Active Listening, Stakeholder Mapping",
@@ -119,18 +132,28 @@ const DEFAULT_CERTS = [
     if (snap.exists() && Object.keys(snap.data()).length) d = { ...DEFAULT_HEADER, ...snap.data() };
   } catch (err) { /* keep defaults */ }
 
-  // Profile photo — pulled from the same Firestore field the admin's
-  // About Me photo uploader writes to (site_content/home.photoURL)
+  // Profile photo + career start date — pulled from the same Firestore
+  // doc the admin's About Me tab writes to (site_content/home)
+  let careerStartDate = null;
   try {
     const homeSnap = await getDoc(doc(db, "site_content", "home"));
-    if (homeSnap.exists() && homeSnap.data().photoURL) {
-      document.getElementById("rPhoto").src = homeSnap.data().photoURL;
+    if (homeSnap.exists()) {
+      const homeData = homeSnap.data();
+      if (homeData.photoURL) document.getElementById("rPhoto").src = homeData.photoURL;
+      careerStartDate = homeData.careerStartDate || null;
     }
   } catch (err) { /* keep default image */ }
 
   set("rName", d.name);
   set("rHeadline", d.headline);
-  set("rSummary", d.summary);
+  // Supports an optional {experienceYears} token in the Summary text,
+  // e.g. "...with {experienceYears}+ years of experience...", which is
+  // replaced with a live-calculated number so it never goes stale.
+  const experienceYears = calculateYearsOfExperience(careerStartDate);
+  const summaryText = experienceYears !== null && d.summary
+    ? d.summary.replace(/\{experienceYears\}/g, experienceYears)
+    : (d.summary || "").replace(/\{experienceYears\}/g, "9");
+  set("rSummary", summaryText);
   set("rLanguages", d.languages);
   set("rReferences", d.references);
 

@@ -8,7 +8,7 @@ const DEFAULT_ABOUT = {
   name: "Md. Rashedul Haque",
   location: "Savar, Dhaka-1340",
   degree: "MBA-HRM, BS-EEE",
-  experienceYears: "9",
+  careerStartDate: "2016-10-01",
   phone: "On request",
   email: "rhaque.eee@gmail.com",
   availability: "Open to opportunities",
@@ -16,6 +16,19 @@ const DEFAULT_ABOUT = {
   socialLinkedin: "https://www.linkedin.com/in/rashedulhaque",
   bio: "I am a passionate Human Resources professional with a strong background in HR operations, data analytics, and strategic business partnering. Currently serving as a Strategic Partner at Youngone Hi-Tech (Dhaka EPZ), I focus on aligning people strategies with organizational goals, driving employee engagement, and supporting leadership in building a high-performing culture."
 };
+
+function calculateYearsOfExperience(isoDate) {
+  if (!isoDate) return null;
+  const start = new Date(isoDate + "T00:00:00");
+  if (isNaN(start.getTime())) return null;
+  const today = new Date();
+  let years = today.getFullYear() - start.getFullYear();
+  const hasPassedAnniversary =
+    today.getMonth() > start.getMonth() ||
+    (today.getMonth() === start.getMonth() && today.getDate() >= start.getDate());
+  if (!hasPassedAnniversary) years--;
+  return Math.max(0, years);
+}
 
 const DEFAULT_SKILLS = [
   { name: "HR Business Partnering", percentage: 95 },
@@ -44,16 +57,17 @@ const DEFAULT_EXPERIENCE = [
   } catch (err) { /* keep defaults */ }
 
   const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+  const experienceYears = calculateYearsOfExperience(about.careerStartDate);
   set("sbName", about.name);
   set("aboutBio", about.bio);
   set("infoName", about.name);
   set("infoLocation", about.location);
   set("infoDegree", about.degree);
-  set("infoExperience", about.experienceYears ? `${about.experienceYears}+ Years` : null);
+  set("infoExperience", experienceYears !== null ? `${experienceYears}+ Years` : null);
   set("infoPhone", about.phone);
   set("infoEmail", about.email);
   set("infoAvailability", about.availability);
-  set("statExperience", about.experienceYears);
+  set("statExperience", experienceYears);
   if (about.photoURL) {
     const photoEl = document.getElementById("sbPhoto");
     if (photoEl) photoEl.src = about.photoURL;
