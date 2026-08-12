@@ -353,6 +353,7 @@ function clearProjectForm() {
   el("projectDesc").value = "";
   el("projectLink").value = "";
   el("projectImage").value = "";
+  el("projectGallery").value = "";
 }
 el("clearProjectForm").addEventListener("click", clearProjectForm);
 
@@ -377,6 +378,7 @@ async function loadProjects() {
     el("projectDesc").value = p.description || "";
     el("projectLink").value = p.link || "";
     el("projectImage").value = p.image || "";
+    el("projectGallery").value = (p.gallery || []).join("\n");
   }));
   list.querySelectorAll("[data-delete]").forEach(b => b.addEventListener("click", async () => {
     if (!confirm("Delete this project?")) return;
@@ -390,7 +392,8 @@ el("saveProject").addEventListener("click", async () => {
     title: el("projectTitle").value,
     description: el("projectDesc").value,
     link: el("projectLink").value,
-    image: el("projectImage").value
+    image: el("projectImage").value,
+    gallery: el("projectGallery").value.split("\n").map(l => l.trim()).filter(Boolean)
   };
   const id = el("projectId").value;
   el("projectMsg").style.color = "";

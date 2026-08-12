@@ -212,15 +212,17 @@ const DEFAULT_SERVICES = [
       const p = d.data();
       return `
         <div class="col-md-6 mb-4">
-          <div class="position-relative overflow-hidden mb-2" style="background:var(--secondary);border-radius:6px;">
-            ${p.image
-              ? `<img class="img-fluid w-100" src="${p.image}" alt="${p.title || ''}" style="aspect-ratio:16/10;object-fit:cover;">`
-              : `<div style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;"><i class="fa fa-2x fa-briefcase text-primary"></i></div>`}
-            <div class="portfolio-btn d-flex align-items-center justify-content-center">
-              ${p.link ? `<a href="${p.link}" target="_blank" rel="noopener"><i class="bi bi-plus text-light"></i></a>` : ""}
+          <a href="project-detail.html?id=${d.id}" style="text-decoration:none;color:inherit;">
+            <div class="position-relative overflow-hidden mb-2" style="background:var(--secondary);border-radius:6px;">
+              ${p.image
+                ? `<img class="img-fluid w-100" src="${p.image}" alt="${p.title || ''}" style="aspect-ratio:16/10;object-fit:cover;">`
+                : `<div style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;"><i class="fa fa-2x fa-briefcase text-primary"></i></div>`}
+              <div class="portfolio-btn d-flex align-items-center justify-content-center">
+                <i class="bi bi-plus text-light"></i>
+              </div>
             </div>
-          </div>
-          <h6 class="mb-0">${p.title || ""}</h6>
+            <h6 class="mb-0">${p.title || ""}</h6>
+          </a>
         </div>
       `;
     }).join("");

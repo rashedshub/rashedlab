@@ -4,32 +4,30 @@ import { getFirestore, collection, getDocs } from "https://www.gstatic.com/fireb
 const db = getFirestore(app);
 
 (async () => {
-  const body = document.getElementById("projectTableBody");
+  const grid = document.getElementById("projectGrid");
   let projects = [];
   try {
     const snap = await getDocs(collection(db, "projects"));
-    projects = snap.docs.map(d => d.data());
+    projects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (err) {
     console.error("Failed to load projects:", err);
   }
 
   if (!projects.length) {
-    body.innerHTML = `<tr><td colspan="4" class="bw-empty">No projects added yet — check back soon, or add some from the admin panel.</td></tr>`;
+    grid.innerHTML = `<p class="bw-empty">No projects added yet — check back soon, or add some from the admin panel.</p>`;
     return;
   }
 
-  body.innerHTML = projects.map(p => `
-    <tr>
-      <td class="bw-thumb-cell">
-        ${p.image
-          ? `<img class="bw-thumb" src="${p.image}" alt="${p.title || ''}">`
-          : `<div class="bw-thumb-placeholder">&#9679;</div>`}
-      </td>
-      <td>
-        <div class="bw-title">${p.link ? `<a href="${p.link}" target="_blank" rel="noopener">${p.title || "Untitled"}</a>` : (p.title || "Untitled")}</div>
-      </td>
-      <td class="col-desc"><div class="bw-desc">${p.description || ""}</div></td>
-      <td>${p.link ? `<a class="bw-link" href="${p.link}" target="_blank" rel="noopener">View →</a>` : ""}</td>
-    </tr>
+  grid.innerHTML = projects.map(p => `
+    <a class="proj-card" href="project-detail.html?id=${p.id}">
+      ${p.image
+        ? `<img class="proj-card-thumb" src="${p.image}" alt="${p.title || ''}">`
+        : `<div class="proj-card-thumb-placeholder">&#9679;</div>`}
+      <div class="proj-card-body">
+        <div class="proj-card-title">${p.title || "Untitled"}</div>
+        <div class="proj-card-summary">${(p.description || "").slice(0, 130)}${(p.description || "").length > 130 ? "…" : ""}</div>
+        <span class="proj-card-cta">View Project →</span>
+      </div>
+    </a>
   `).join("");
 })();

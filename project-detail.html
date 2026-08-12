@@ -2,16 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Projects — Md. Rashedul Haque</title>
-<meta name="description" content="HR analytics dashboards, HRMS automation, and process improvement projects by Md. Rashedul Haque, HR Business Partner at Youngone Corporation.">
+<title>Project — Md. Rashedul Haque</title>
 <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="portfolio.css"/>
 <link rel="stylesheet" href="css/mainnav.css"/>
-<link rel="stylesheet" href="css/monochrome.css"/>
-<link rel="stylesheet" href="css/project-grid.css"/>
+<link rel="stylesheet" href="css/project-detail.css"/>
+<link rel="stylesheet" href="css/gallery.css"/>
 </head>
 <body>
   <nav class="mainnav" id="mainnav">
@@ -42,20 +41,36 @@
     </div>
   </div>
 </nav>
-<div class="bw-theme">
-  <header class="bw-header">
-    <h1>Projects</h1>
-    <p>HR analytics dashboards, HRMS automation, and process improvement work.</p>
-  </header>
-  <div class="proj-grid-wrap">
-    <div class="proj-grid" id="projectGrid">
-      <p class="bw-empty">Loading projects…</p>
-    </div>
+
+<div class="pd-theme">
+  <div class="pd-hero">
+    <a class="pd-back" href="projects.html">&larr; Back to Projects</a>
+    <img id="pdHeroImg" class="pd-hero-img" src="" alt="" style="display:none;">
+  </div>
+  <div class="pd-body">
+    <h1 class="pd-title" id="pdTitle">Loading…</h1>
+    <a id="pdLink" class="pd-link" href="#" target="_blank" rel="noopener" style="display:none;">Visit Project &rarr;</a>
+    <p class="pd-description" id="pdDescription"></p>
+  </div>
+  <div class="pd-gallery-section" id="pdGallerySection" style="display:none;">
+    <div class="pd-gallery-heading">Gallery</div>
+    <div class="pd-gallery-grid" id="pdGalleryGrid"></div>
   </div>
 </div>
+
+<!-- Lightbox (shared pattern with the main Gallery page) -->
+<div class="gal-lightbox" id="galLightbox">
+  <button class="gal-lightbox-close" id="galClose" aria-label="Close">&times;</button>
+  <button class="gal-lightbox-prev" id="galPrev" aria-label="Previous">&#8249;</button>
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <img id="galLightboxImg" src="" alt=""/>
+  </div>
+  <button class="gal-lightbox-next" id="galNext" aria-label="Next">&#8250;</button>
+</div>
+
 <footer class="site-footer"><p>&copy; 2026 Md. Rashedul Haque.</p></footer>
 <script type="module" src="js/auth-nav.js"></script>
-<script type="module" src="js/projects.js"></script>
+<script type="module" src="js/project-detail.js"></script>
 <script src="js/mainnav.js"></script>
 </body>
 </html>

@@ -314,8 +314,11 @@
       <textarea class="form-control" id="projectDesc" rows="3"></textarea>
       <label>Link (URL)</label>
       <input type="text" class="form-control" id="projectLink"/>
-      <label>Image URL (optional)</label>
+      <label>Cover Image URL — shown on the Projects page grid</label>
       <input type="text" class="form-control" id="projectImage"/>
+      <label>Additional Gallery Images — one URL per line, shown on the project's detail page</label>
+      <textarea class="form-control" id="projectGallery" rows="4" placeholder="https://example.com/photo1.jpg
+https://example.com/photo2.jpg"></textarea>
       <button class="btn-save" id="saveProject">Save Project</button>
       <button class="btn-clear" id="clearProjectForm" type="button">Clear / New</button>
       <p class="save-msg" id="projectMsg"></p>
