@@ -8,6 +8,25 @@ const projectId = params.get("id");
 let galleryImages = [];
 let currentIndex = 0;
 
+function escapeHtml(s) {
+  return (s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+// Supports **bold**, __bold__, *italic*, _italic_ — everything else is
+// HTML-escaped first, so this can never introduce real markup/scripts,
+// only the two safe inline styles below.
+function renderFormattedText(raw) {
+  let out = escapeHtml(raw);
+  out = out.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  out = out.replace(/__(.+?)__/g, "<strong>$1</strong>");
+  out = out.replace(/(^|[^*])\*(?!\*)([^*]+?)\*(?!\*)/g, "$1<em>$2</em>");
+  out = out.replace(/(^|[^_])_(?!_)([^_]+?)_(?!_)/g, "$1<em>$2</em>");
+  return out;
+}
+
 if (!projectId) {
   document.getElementById("pdTitle").textContent = "Project not found";
 } else {
@@ -24,7 +43,7 @@ async function loadProject() {
 
   document.title = `${p.title || "Project"} — Md. Rashedul Haque`;
   document.getElementById("pdTitle").textContent = p.title || "Untitled";
-  document.getElementById("pdDescription").textContent = p.description || "";
+  document.getElementById("pdDescription").innerHTML = renderFormattedText(p.description || "");
 
   if (p.image) {
     const hero = document.getElementById("pdHeroImg");
