@@ -114,6 +114,7 @@
     <div class="mainnav-links" id="navLinks">
       <a href="index.html#about" data-target="about" data-anchor="true">About</a>
       <a href="index.html#skills" data-target="skills" data-anchor="true">Skills</a>
+      <a href="index.html#currentwork" data-target="currentwork" data-anchor="true">Current Work</a>
       <a href="index.html#experience" data-target="experience" data-anchor="true">Experience</a>
       <a href="index.html#services" data-target="services" data-anchor="true">Services</a>
       <a href="index.html#portfolio" data-target="portfolio" data-anchor="true">Portfolio</a>
@@ -141,6 +142,7 @@
   <div class="tabs">
     <button data-panel="about" class="active">About Me</button>
     <button data-panel="skills">Skills</button>
+    <button data-panel="currentwork">Current Work</button>
     <button data-panel="experience">Experience</button>
     <button data-panel="resumeinfo">Resume Info</button>
     <button data-panel="resumesections">Resume Sections</button>
@@ -253,6 +255,26 @@
     </div>
     <h3 style="color:#fff;">Existing Skills</h3>
     <div id="skillList"></div>
+  </div>
+
+  <!-- CURRENT WORK -->
+  <div class="panel" id="panel-currentwork">
+    <div class="panel-card">
+      <h3>Add / Edit Current Work</h3>
+      <p style="color:rgba(242,242,242,0.55);font-size:0.85rem;">Active projects or initiatives you're currently working on, shown with a progress bar on the Home page.</p>
+      <input type="hidden" id="cwId"/>
+      <label>Project / Initiative Name</label>
+      <input type="text" class="form-control" id="cwName" placeholder="HRMS Module Rollout — Phase 2"/>
+      <label>Progress (%)</label>
+      <input type="number" class="form-control" id="cwPercentage" min="0" max="100"/>
+      <label>Order (lower shows first)</label>
+      <input type="number" class="form-control" id="cwOrder" style="max-width:120px;"/>
+      <button class="btn-save" id="saveCw">Save</button>
+      <button class="btn-clear" id="clearCwForm" type="button">Clear / New</button>
+      <p class="save-msg" id="cwMsg"></p>
+    </div>
+    <h3 style="color:#fff;">Existing Current Work</h3>
+    <div id="cwList"></div>
   </div>
 
   <!-- EXPERIENCE -->

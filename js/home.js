@@ -146,6 +146,38 @@ const DEFAULT_EXPERIENCE = [
   `).join("");
 })();
 
+/* ── Current Work — active projects/initiatives with progress ── */
+(async () => {
+  const container = document.getElementById("currentWorkContainer");
+  if (!container) return;
+  let items = [];
+  try {
+    const snap = await getDocs(query(collection(db, "current_work"), orderBy("order", "asc")));
+    items = snap.docs.map(d => d.data());
+  } catch (err) {
+    console.error("Failed to load current work:", err);
+  }
+
+  if (!items.length) {
+    container.innerHTML = `<p style="color:rgba(242,242,242,0.6);">Nothing in progress right now — check back soon.</p>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="row">` + items.map(w => `
+    <div class="col-sm-6">
+      <div class="skill mb-4">
+        <div class="d-flex justify-content-between">
+          <p class="mb-2">${w.name || ""}</p>
+          <p class="mb-2">${w.percentage || 0}%</p>
+        </div>
+        <div class="progress">
+          <div class="progress-bar bg-primary" role="progressbar" style="width:${w.percentage || 0}%" aria-valuenow="${w.percentage || 0}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+    </div>
+  `).join("") + `</div>`;
+})();
+
 /* ── Experience (short summary version for Home) ────────── */
 (async () => {
   const container = document.getElementById("experienceContainer");

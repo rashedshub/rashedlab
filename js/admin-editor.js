@@ -37,6 +37,7 @@ onAuthStateChanged(auth, async (user) => {
   loadMessages();
   loadServices();
   loadGallery();
+  loadCurrentWork();
 });
 
 el("logoutBtn").addEventListener("click", () => signOut(auth).then(() => window.location.href = "admin-login.html"));
@@ -911,4 +912,20 @@ el("saveGal").addEventListener("click", async () => {
     el("galMsg").style.color = "#ff8080";
     el("galMsg").textContent = `Save failed: ${err.message}`;
   }
+});
+
+// Current Work (Home page progress section)
+const loadCurrentWork = makeListCrud({
+  collectionName: "current_work",
+  formIdPrefix: "cw",
+  listElId: "cwList",
+  msgElId: "cwMsg",
+  saveBtnId: "saveCw",
+  clearBtnId: "clearCwForm",
+  fields: [
+    { id: "cwName", key: "name" },
+    { id: "cwPercentage", key: "percentage", type: "number" },
+    { id: "cwOrder", key: "order", type: "number" }
+  ],
+  renderRow: d => `<strong>${d.name || ""}</strong><p>${d.percentage || 0}% complete</p>`
 });
