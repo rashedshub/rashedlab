@@ -146,7 +146,7 @@ const DEFAULT_EXPERIENCE = [
   `).join("");
 })();
 
-/* ── Current Work — active projects/initiatives with progress ── */
+/* ── Ongoing Initiatives — active projects with progress ──── */
 (async () => {
   const container = document.getElementById("currentWorkContainer");
   if (!container) return;

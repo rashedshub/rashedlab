@@ -914,7 +914,7 @@ el("saveGal").addEventListener("click", async () => {
   }
 });
 
-// Current Work (Home page progress section)
+// Ongoing Initiatives (Home page progress section)
 const loadCurrentWork = makeListCrud({
   collectionName: "current_work",
   formIdPrefix: "cw",
