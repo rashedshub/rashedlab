@@ -925,6 +925,7 @@ const loadCurrentWork = makeListCrud({
   fields: [
     { id: "cwName", key: "name" },
     { id: "cwPercentage", key: "percentage", type: "number" },
+    { id: "cwIcon", key: "icon" },
     { id: "cwOrder", key: "order", type: "number" }
   ],
   renderRow: d => `<strong>${d.name || ""}</strong><p>${d.percentage || 0}% complete</p>`

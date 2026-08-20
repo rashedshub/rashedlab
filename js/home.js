@@ -163,16 +163,12 @@ const DEFAULT_EXPERIENCE = [
     return;
   }
 
-  container.innerHTML = `<div class="row">` + items.map(w => `
-    <div class="col-sm-6">
-      <div class="skill mb-4">
-        <div class="d-flex justify-content-between">
-          <p class="mb-2">${w.name || ""}</p>
-          <p class="mb-2">${w.percentage || 0}%</p>
-        </div>
-        <div class="progress">
-          <div class="progress-bar bg-primary" role="progressbar" style="width:${w.percentage || 0}%" aria-valuenow="${w.percentage || 0}" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
+  container.innerHTML = `<div class="row g-4">` + items.map(w => `
+    <div class="col-md-6">
+      <div class="service-item">
+        <i class="fa fa-2x ${w.icon || 'fa-project-diagram'} mx-auto mb-4"></i>
+        <h5 class="mb-2">${w.name || ""}</h5>
+        <p class="mb-0">${w.percentage || 0}% Complete</p>
       </div>
     </div>
   `).join("") + `</div>`;

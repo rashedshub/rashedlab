@@ -261,12 +261,14 @@
   <div class="panel" id="panel-ongoinginitiatives">
     <div class="panel-card">
       <h3>Add / Edit Ongoing Initiative</h3>
-      <p style="color:rgba(242,242,242,0.55);font-size:0.85rem;">Active projects or initiatives you're currently working on, shown with a progress bar on the Home page.</p>
+      <p style="color:rgba(242,242,242,0.55);font-size:0.85rem;">Active projects or initiatives you're currently working on, shown as icon cards on the Home page.</p>
       <input type="hidden" id="cwId"/>
       <label>Project / Initiative Name</label>
       <input type="text" class="form-control" id="cwName" placeholder="HRMS Module Rollout — Phase 2"/>
       <label>Progress (%)</label>
       <input type="number" class="form-control" id="cwPercentage" min="0" max="100"/>
+      <label>Icon — <a href="https://fontawesome.com/search?o=r&m=free&s=solid" target="_blank" rel="noopener" style="color:var(--primary);">browse free solid icons</a> (make sure "Free" filter is on)</label>
+      <input type="text" class="form-control" id="cwIcon" placeholder="fa-project-diagram"/>
       <label>Order (lower shows first)</label>
       <input type="number" class="form-control" id="cwOrder" style="max-width:120px;"/>
       <button class="btn-save" id="saveCw">Save</button>
