@@ -1,0 +1,55 @@
+/* ── Poems page — literary, warm paper + ink, one poem at a time ── */
+
+.poems-theme { background: var(--paper); min-height: 100vh; }
+
+.poems-header {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 28px 20px;
+  text-align: center;
+}
+.poems-header h1 {
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  color: var(--ink);
+  margin: 0 0 10px;
+}
+.poems-header p { color: var(--muted); font-size: 1rem; margin: 0; }
+
+.poems-list {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px 28px 100px;
+}
+
+.poem-card {
+  padding: 40px 0;
+  border-bottom: 1px solid var(--border);
+}
+.poem-card:last-child { border-bottom: none; }
+
+.poem-title {
+  font-size: 1.5rem;
+  color: var(--ink);
+  text-align: center;
+  margin: 0 0 6px;
+}
+.poem-date {
+  display: block;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 26px;
+}
+
+.poem-text {
+  white-space: pre-wrap;
+  color: var(--text);
+  font-size: 1.08rem;
+  line-height: 2;
+  text-align: center;
+}
+
+.poems-empty { text-align: center; color: var(--muted); padding: 60px 20px; }

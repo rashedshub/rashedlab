@@ -124,6 +124,7 @@
       <a href="resume.html" data-target="resume" data-page="resume.html">Resume</a>
       <a href="blog.html" data-target="blog" data-page="blog.html">Blog</a>
       <a href="gallery.html" data-target="gallery" data-page="gallery.html">Gallery</a>
+      <a href="poems.html" data-target="poems" data-page="poems.html">Poems</a>
       <span class="mainnav-divider"></span>
       <a href="admin-login.html" data-target="admin-login.html" data-page="admin-login.html">Admin</a>
       <span class="mainnav-divider"></span>
@@ -151,6 +152,7 @@
     <button data-panel="blog">Blog</button>
     <button data-panel="messages">Messages</button>
     <button data-panel="gallery">Gallery</button>
+    <button data-panel="poems">Poems</button>
   </div>
 
   <!-- ABOUT ME -->
@@ -398,6 +400,27 @@ https://example.com/photo2.jpg"></textarea>
     </div>
     <h3 style="color:#fff;">Existing Photos</h3>
     <div id="galList"></div>
+  </div>
+
+  <!-- POEMS -->
+  <div class="panel" id="panel-poems">
+    <div class="panel-card">
+      <h3>Add / Edit Poem</h3>
+      <input type="hidden" id="poemId"/>
+      <label>Title</label>
+      <input type="text" class="form-control" id="poemTitle"/>
+      <label>Poem Text — supports **bold** and *italic*; line breaks are preserved exactly as written</label>
+      <textarea class="form-control" id="poemText" rows="10" placeholder="Write or paste your poem here…"></textarea>
+      <label>Date (optional)</label>
+      <input type="text" class="form-control" id="poemDate" placeholder="September 2026"/>
+      <label>Order (lower shows first)</label>
+      <input type="number" class="form-control" id="poemOrder" style="max-width:120px;"/>
+      <button class="btn-save" id="savePoem">Save Poem</button>
+      <button class="btn-clear" id="clearPoemForm" type="button">Clear / New</button>
+      <p class="save-msg" id="poemMsg"></p>
+    </div>
+    <h3 style="color:#fff;">Existing Poems</h3>
+    <div id="poemList"></div>
   </div>
 
   <!-- RESUME INFO -->
