@@ -38,6 +38,7 @@ onAuthStateChanged(auth, async (user) => {
   loadServices();
   loadGallery();
   loadCurrentWork();
+  loadPoems();
 });
 
 el("logoutBtn").addEventListener("click", () => signOut(auth).then(() => window.location.href = "admin-login.html"));
@@ -929,4 +930,21 @@ const loadCurrentWork = makeListCrud({
     { id: "cwOrder", key: "order", type: "number" }
   ],
   renderRow: d => `<strong>${d.name || ""}</strong><p>${d.percentage || 0}% complete</p>`
+});
+
+// Poems
+const loadPoems = makeListCrud({
+  collectionName: "poems",
+  formIdPrefix: "poem",
+  listElId: "poemList",
+  msgElId: "poemMsg",
+  saveBtnId: "savePoem",
+  clearBtnId: "clearPoemForm",
+  fields: [
+    { id: "poemTitle", key: "title" },
+    { id: "poemText", key: "text" },
+    { id: "poemDate", key: "date" },
+    { id: "poemOrder", key: "order", type: "number" }
+  ],
+  renderRow: d => `<strong>${d.title || ""}</strong><p>${d.date || ""}</p>`
 });
