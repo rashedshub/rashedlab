@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Task Tracker — Md. Rashedul Haque</title>
+<meta name="description" content="A simple task tracker with deadlines, priorities and a dashboard.">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portfolio.css"/>
+<link rel="stylesheet" href="css/mainnav.css"/>
+<link rel="stylesheet" href="css/tasks.css"/>
+</head>
+<body class="tt-theme">
+  <nav class="mainnav" id="mainnav">
+  <div class="mainnav-inner">
+    <a class="mainnav-brand" href="index.html">
+      <span class="mainnav-brand-badge">RH</span>
+      Rashedul Haque
+    </a>
+    <button class="mainnav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="mainnav-links" id="navLinks">
+      <a href="index.html#about" data-target="about" data-anchor="true">About</a>
+      <a href="index.html#skills" data-target="skills" data-anchor="true">Skills</a>
+      <a href="index.html#ongoing-initiatives" data-target="ongoing-initiatives" data-anchor="true">Ongoing Initiatives</a>
+      <a href="index.html#experience" data-target="experience" data-anchor="true">Experience</a>
+      <a href="index.html#services" data-target="services" data-anchor="true">Services</a>
+      <a href="index.html#portfolio" data-target="portfolio" data-anchor="true">Portfolio</a>
+      <a href="index.html#contact" data-target="contact" data-anchor="true">Contact</a>
+      <span class="mainnav-divider"></span>
+      <a href="projects.html" data-target="projects" data-page="projects.html">Projects</a>
+      <a href="resume.html" data-target="resume" data-page="resume.html">Resume</a>
+      <a href="blog.html" data-target="blog" data-page="blog.html">Blog</a>
+      <a href="gallery.html" data-target="gallery" data-page="gallery.html">Gallery</a>
+      <a href="poems.html" data-target="poems" data-page="poems.html">Poems</a>
+      <a href="tasks.html" data-target="tasks" data-page="tasks.html">Tasks</a>
+      <span class="mainnav-divider"></span>
+      <a href="admin-login.html" data-target="admin-login.html" data-page="admin-login.html">Admin</a>
+      <span class="mainnav-divider"></span>
+      <span id="authNav" class="mainnav-auth"><a href="login.html">Login</a></span>
+    </div>
+  </div>
+</nav>
+<main class="tt-wrap">
+  <header class="tt-head"><h1>Task Tracker</h1><p>Add, edit and track everything you need to get done. Tasks are saved in this browser only.</p></header>
+  <div class="tt-tabs"><a id="tt-n-tasks" href="#tasks">Tasks</a><a id="tt-n-dashboard" href="#dashboard">Dashboard</a></div>
+
+  <section id="tt-v-tasks">
+    <div id="alert"></div>
+    <div class="tt-bar">
+      <input type="search" id="q" placeholder="Search tasks…">
+      <select id="fs"></select><select id="fc"></select><select id="fp"></select><select id="fq"></select>
+      <button class="tt-btn" id="add">+ Add task</button>
+    </div>
+    <div class="tt-card tt-tw"><table><thead><tr><th>Task</th><th>Deadline</th><th>Category</th><th>Priority</th><th>Matrix</th><th>Status</th><th></th></tr></thead><tbody id="rows"></tbody></table><div class="tt-empty" id="empty" style="display:none">No tasks match. Add one to get started.</div></div>
+  </section>
+
+  <section id="tt-v-dashboard" style="display:none">
+    <div class="tt-cards" id="cards"></div>
+    <div class="tt-grid2">
+      <div class="tt-card"><h3>Tasks by category</h3><div class="tt-ch"><canvas id="c1"></canvas></div></div>
+      <div class="tt-card"><h3>Tasks by status</h3><div class="tt-ch"><canvas id="c2"></canvas></div></div>
+      <div class="tt-card"><h3>Tasks by priority</h3><div class="tt-ch"><canvas id="c3"></canvas></div></div>
+      <div class="tt-card"><h3>Time management matrix</h3><div class="tt-mx" id="mx"></div></div>
+    </div>
+    <div class="tt-card tt-tw"><h3 style="padding:16px 16px 0">Overdue tasks</h3><table><thead><tr><th>Task</th><th>Deadline</th><th>Category</th><th>Priority</th><th>Status</th></tr></thead><tbody id="ovrows"></tbody></table><div class="tt-empty" id="ovempty" style="display:none">Nothing overdue. Nice work!</div></div>
+  </section>
+</main>
+
+<div class="tt-ov" id="ov"><form class="tt-modal" id="form">
+  <h2 id="mt">Add task</h2>
+  <div class="tt-f">
+    <label class="full">Title<input id="f-title" required maxlength="120"></label>
+    <label>Deadline<input type="date" id="f-date" required></label>
+    <label>Category<select id="f-cat"></select></label>
+    <label>Priority<select id="f-pri"></select></label>
+    <label>Matrix<select id="f-q"></select></label>
+    <label class="full">Status<select id="f-st"></select></label>
+  </div>
+  <div class="tt-acts"><button type="button" class="tt-btn ghost" id="cancel">Cancel</button><button class="tt-btn">Save</button></div>
+</form></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script type="module" src="js/auth-nav.js"></script>
+<script src="js/mainnav.js"></script>
+<script src="js/tasks.js"></script>
+</body>
+</html>
