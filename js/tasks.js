@@ -1,6 +1,17 @@
-/* Task Tracker — client-side only. Tasks live in this browser's localStorage. */
+/* Task Tracker — tasks are stored in Firestore (`tasks` collection), private to the
+   admin account, and sync live across every device where you're signed in. */
+import { app } from "./firebase.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
 (function () {
   "use strict";
+
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const col = collection(db, "tasks");
 
   const KEY = "tt.tasks.v1";
   const STATUSES = ["Not started", "In progress", "On hold", "Completed"];
@@ -19,18 +30,30 @@
   const slug = (s) => s.toLowerCase().replace(/\s+/g, "-");
   const quadLabel = (id) => (QUADS.find((q) => q.id === id) || QUADS[1]).label;
 
-  /* ── storage ─────────────────────────────────────────── */
-  let storageOk = true;
-  function load() {
+  /* ── state ───────────────────────────────────────────── */
+  let tasks = [];
+  let syncError = "";
+  let unsub = null;
+
+  // Tasks saved in this browser by the earlier local-only version of this page
+  const LEGACY_KEY = "tt.tasks.v1";
+  function loadLegacy() {
     try {
-      const a = JSON.parse(localStorage.getItem(KEY) || "[]");
-      return Array.isArray(a) ? a.filter((t) => t && t.title) : [];
-    } catch (e) { storageOk = false; return []; }
+      const a = JSON.parse(localStorage.getItem(LEGACY_KEY) || "[]");
+      return Array.isArray(a) ? a.filter((t) => t && t.title && t.date) : [];
+    } catch (e) { return []; }
   }
-  let tasks = load();
-  function save() {
-    try { localStorage.setItem(KEY, JSON.stringify(tasks)); storageOk = true; }
-    catch (e) { storageOk = false; }
+
+  // Run a Firestore write; surface failures in the alert area
+  async function run(fn) {
+    try { await fn(); if (syncError) { syncError = ""; refresh(); } }
+    catch (e) {
+      console.error("Task save failed:", e);
+      syncError = e && e.code === "permission-denied"
+        ? "Permission denied — publish the updated Firestore rules (they must include the tasks collection)."
+        : "Couldn't save that change: " + (e && e.message ? e.message : "unknown error");
+      refresh();
+    }
   }
 
   /* ── dates ───────────────────────────────────────────── */
@@ -98,7 +121,9 @@
     if (od) parts.push(`<strong>${od}</strong> overdue`);
     if (dt) parts.push(`<strong>${dt}</strong> due today`);
     let html = "";
-    if (!storageOk) html += `<div class="tt-alert err">This browser is blocking local storage, so tasks won't be saved after you leave the page.</div>`;
+    if (syncError) html += `<div class="tt-alert err">${esc(syncError)}</div>`;
+    const legacy = loadLegacy();
+    if (legacy.length) html += `<div class="tt-alert warn">Found <strong>${legacy.length}</strong> task${legacy.length > 1 ? "s" : ""} saved in this browser from before. <button type="button" class="tt-btn ghost" data-a="import">Import to my account</button></div>`;
     if (parts.length) html += `<div class="tt-alert warn">${parts.join(" · ")}</div>`;
     $("alert").innerHTML = html;
   }
@@ -130,9 +155,11 @@
     const t = tasks.find((x) => x.id === b.dataset.id);
     if (!t) return;
     if (b.dataset.a === "edit") openForm(t);
-    if (b.dataset.a === "done") { t.st = t.st === "Completed" ? "In progress" : "Completed"; save(); renderTasks(); }
+    if (b.dataset.a === "done") {
+      run(() => updateDoc(doc(db, "tasks", t.id), { st: t.st === "Completed" ? "In progress" : "Completed" }));
+    }
     if (b.dataset.a === "del" && confirm(`Delete "${t.title}"?`)) {
-      tasks = tasks.filter((x) => x.id !== t.id); save(); renderTasks();
+      run(() => deleteDoc(doc(db, "tasks", t.id)));
     }
   });
   ["q", "fs", "fc", "fp", "fq"].forEach((id) => {
@@ -168,13 +195,10 @@
       title, date: $("f-date").value, cat: $("f-cat").value,
       pri: $("f-pri").value, q: $("f-q").value, st: $("f-st").value
     };
-    if (editingId) {
-      const t = tasks.find((x) => x.id === editingId);
-      if (t) Object.assign(t, data);
-    } else {
-      tasks.push(Object.assign({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6) }, data));
-    }
-    save(); closeForm(); renderTasks();
+    const id = editingId;
+    closeForm();
+    if (id) run(() => updateDoc(doc(db, "tasks", id), data));
+    else run(() => addDoc(col, Object.assign({ createdAt: Date.now() }, data)));
   });
 
   /* ── dashboard ───────────────────────────────────────── */
@@ -245,6 +269,59 @@
     $("tt-n-dashboard").classList.toggle("on", dash);
     if (dash) renderDashboard(); else renderTasks();
   }
+  const refresh = route;
   window.addEventListener("hashchange", route);
-  route();
+
+  $("alert").addEventListener("click", (e) => {
+    if (!e.target.closest('[data-a="import"]')) return;
+    const legacy = loadLegacy();
+    run(async () => {
+      await Promise.all(legacy.map((t) => addDoc(col, {
+        title: String(t.title), date: t.date, cat: CATS.includes(t.cat) ? t.cat : "Other",
+        pri: PRIS.includes(t.pri) ? t.pri : "Medium", q: QUADS.some((q) => q.id === t.q) ? t.q : "q2",
+        st: STATUSES.includes(t.st) ? t.st : "Not started", createdAt: Date.now()
+      })));
+      localStorage.removeItem(LEGACY_KEY);
+      refresh();
+    });
+  });
+
+  /* ── access gate: tasks are private to the admin account ── */
+  const wrap = document.querySelector(".tt-wrap");
+  const gate = document.createElement("div");
+  gate.className = "tt-card tt-gate";
+  wrap.insertBefore(gate, wrap.querySelector(".tt-tabs"));
+
+  function lock(html) { wrap.classList.add("tt-locked"); gate.innerHTML = html; gate.style.display = ""; }
+  function unlock() { wrap.classList.remove("tt-locked"); gate.style.display = "none"; }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (unsub) { unsub(); unsub = null; }
+    tasks = [];
+    if (!user) {
+      lock(`<h3>Private task tracker</h3><p>Sign in with your admin account to see and manage your tasks. They sync across all your devices.</p><a class="tt-btn" href="admin-login.html">Admin login</a>`);
+      return;
+    }
+    lock(`<p>Checking your account…</p>`);
+    let admin = false;
+    try { const s = await getDoc(doc(db, "users", user.uid)); admin = s.exists() && s.data().role === "admin"; }
+    catch (e) { /* treated as not admin */ }
+    if (!admin) {
+      lock(`<h3>No access</h3><p>This tracker is only available to the site owner's admin account.</p>`);
+      return;
+    }
+    unlock();
+    route();
+    unsub = onSnapshot(col, (snap) => {
+      tasks = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())).filter((t) => t.title);
+      syncError = "";
+      refresh();
+    }, (err) => {
+      console.error("Task sync failed:", err);
+      syncError = err && err.code === "permission-denied"
+        ? "Permission denied — publish the updated Firestore rules (they must include the tasks collection)."
+        : "Couldn't load your tasks: " + (err && err.message ? err.message : "unknown error");
+      refresh();
+    });
+  });
 })();
