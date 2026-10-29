@@ -106,3 +106,10 @@ td.od small { color: #b3261e; }
   .tt-f { grid-template-columns: 1fr; }
   .tt-wrap { padding: 28px 16px 70px; }
 }
+
+/* access gate (tasks are private to the admin account) */
+.tt-gate { text-align: center; padding: 44px 24px !important; max-width: 520px; margin: 10px auto 0; }
+.tt-gate h3 { font-size: 1.25rem; margin: 0 0 8px; }
+.tt-gate p { color: var(--muted); margin: 0 0 18px; }
+.tt-gate .tt-btn { display: inline-block; }
+.tt-locked .tt-tabs, .tt-locked #tt-v-tasks, .tt-locked #tt-v-dashboard { display: none !important; }
