@@ -175,3 +175,157 @@ section[id] { scroll-margin-top: 112px; }
 
   body { padding-top: 84px; }
 }
+
+/* ============================================================
+   Pages sidebar — holds the page links (Projects, Resume, Blog,
+   Gallery, Poems, Tasks) that used to sit in the top pill.
+   Built by js/mainnav.js. Desktop ≥1280px: pushes content, open
+   by default, remembers your choice. Below that: slide-over drawer.
+   ============================================================ */
+:root { --pb-w: 252px; }
+
+.pagesbar {
+  --pb-text: #F2F2F2;
+  --pb-dim: rgba(242, 242, 242, 0.72);
+  --pb-accent: #00B87B;
+  position: fixed;
+  top: 12px;
+  bottom: 12px;
+  left: 12px;
+  width: 228px;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  background: rgba(28, 40, 51, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  transform: translateX(calc(-100% - 24px));
+  visibility: hidden;
+}
+html.pb-open .pagesbar { transform: none; visibility: visible; }
+
+/* animate only after first paint, so pages don't slide on every load */
+html.pb-anim .pagesbar { transition: transform 0.28s ease, visibility 0s linear 0.28s; }
+html.pb-anim.pb-open .pagesbar { transition: transform 0.28s ease, visibility 0s; }
+
+.pagesbar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 14px 8px 22px;
+}
+.pagesbar-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(242, 242, 242, 0.5);
+}
+.pagesbar-close {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--pb-dim);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.pagesbar-close:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+
+.pagesbar-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 10px;
+  overflow-y: auto;
+}
+.pagesbar-list a {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  color: var(--pb-dim);
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.pagesbar-list a svg { width: 18px; height: 18px; flex-shrink: 0; }
+.pagesbar-list a:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.pagesbar-list a.active { background: var(--pb-accent); color: #fff; }
+
+.pagesbar-foot {
+  padding: 14px 22px 18px;
+  font-size: 0.72rem;
+  color: rgba(242, 242, 242, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* toggle button — sits at the left of the top pill on every page */
+.pagesbar-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #F2F2F2;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.pagesbar-toggle:hover { background: rgba(255, 255, 255, 0.18); }
+.mainnav-inner.has-pagesbar { padding-left: 7px; gap: 10px; }
+.mainnav-inner.has-pagesbar .mainnav-brand { margin-right: auto; }
+
+.pagesbar-toggle:focus-visible,
+.pagesbar-close:focus-visible,
+.pagesbar-list a:focus-visible { outline: 2px solid #00B87B; outline-offset: 2px; }
+
+/* backdrop (drawer mode only) */
+.pagesbar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1090;
+  background: rgba(10, 18, 28, 0.55);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+}
+@media (max-width: 1279.98px) {
+  html.pb-open .pagesbar-backdrop { opacity: 1; visibility: visible; transition: opacity 0.25s ease, visibility 0s; }
+}
+
+/* desktop: the sidebar pushes the page (and the top pill) over */
+@media (min-width: 1280px) {
+  html:not(.pb-closed) body { padding-left: var(--pb-w); }
+  /* The home template's negative row gutters (invisible padding) can poke ~12px past the right
+     edge once the page is narrower than its wide-screen layout expects. Clip at the root so there
+     is no sideways scroll; root-level clipping keeps position:sticky working. */
+  html:not(.pb-closed) { overflow-x: hidden; }
+  html:not(.pb-closed) .mainnav { left: var(--pb-w); }
+  html.pb-anim body { transition: padding-left 0.28s ease; }
+  html.pb-anim .mainnav { transition: left 0.28s ease; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.pb-anim .pagesbar, html.pb-anim body, html.pb-anim .mainnav, .pagesbar-backdrop { transition: none !important; }
+}
+
+/* never print the sidebar (keeps the resume print layout clean) */
+@media print {
+  .pagesbar, .pagesbar-toggle, .pagesbar-backdrop { display: none !important; }
+  html body { padding-left: 0 !important; }
+  .mainnav { left: 0 !important; }
+}
